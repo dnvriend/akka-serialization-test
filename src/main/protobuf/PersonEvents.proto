@@ -1,0 +1,15 @@
+option java_package = "com.github.dnvriend.domain.person.proto";
+option optimize_for = SPEED;
+
+message NameRegistered {
+    required string name = 1;
+    required string surname = 2;
+}
+
+message NameChanged {
+    required string name = 1;
+}
+
+message SurnameChanged {
+    required string surname = 1;
+}
