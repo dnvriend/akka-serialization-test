@@ -32,14 +32,12 @@ class SurnameChangedSerializer extends SerializerWithStringManifest {
     manifest match {
       case Manifest ⇒
         val PersonEvents.SurnameChanged(surname) = PersonEvents.SurnameChanged.parseFrom(bytes)
-        println("Surname changed")
         SurnameChanged(surname)
       case _ ⇒ throw new IllegalArgumentException("Unable to handle manifest: " + manifest)
     }
 
   override def toBinary(o: AnyRef): Array[Byte] = o match {
     case SurnameChanged(surname) ⇒
-      println("Surname changed")
       PersonEvents.SurnameChanged(surname).toByteArray
   }
 }

@@ -16,24 +16,21 @@
 
 package com.github.dnvriend.domain
 
-import akka.actor.{ ActorRef, Props }
 import akka.persistence.inmemory.query.InMemoryReadJournal
 import akka.persistence.query.PersistenceQuery
 import akka.stream.testkit.scaladsl.TestSink
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.domain.Person._
+import com.github.dnvriend.repository.PersonRepository
 
 class PersonTest extends TestSpec {
-  val queries = PersistenceQuery(system).readJournalFor[InMemoryReadJournal](InMemoryReadJournal.Identifier)
-
-  def createPerson(id: String): ActorRef =
-    system.actorOf(Props(new Person(id)))
+  lazy val queries = PersistenceQuery(system).readJournalFor[InMemoryReadJournal](InMemoryReadJournal.Identifier)
 
   def eventsForPersistenceIdSource(id: String) =
     queries.currentEventsByPersistenceId(id, 0L, Long.MaxValue).map(_.event)
 
   "Person" should "register a name" in {
-    val person = createPerson("person-1")
+    val person = PersonRepository.forId("person-1")
     person ! RegisterName("John", "Doe")
 
     eventsForPersistenceIdSource("person-1")
@@ -46,7 +43,7 @@ class PersonTest extends TestSpec {
   }
 
   it should "update its name and surname" in {
-    val person = createPerson("person-1")
+    val person = PersonRepository.forId("person-1")
     person ! ChangeName("Robin")
     person ! ChangeSurname("Hood")
 
