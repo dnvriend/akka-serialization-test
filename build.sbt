@@ -16,15 +16,17 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
     "com.typesafe.akka" %% "akka-persistence" % akkaVersion,
     "com.typesafe.akka" %% "akka-stream-experimental" % akkaStreamAndHttpVersion,
+    "org.json4s" %% "json4s-native" % "3.2.10",
     "com.github.dnvriend" %% "akka-persistence-inmemory" % "1.1.5" % Test,
     "com.typesafe.akka" %% "akka-stream-testkit-experimental" % akkaStreamAndHttpVersion % Test,
-    "org.scalatest" %% "scalatest" % "2.2.4" % Test
+    "org.scalatest" %% "scalatest" % "2.2.4" % Test,
+    "org.scalacheck" %% "scalacheck" % "1.12.5" % Test
   )
 }
 
 fork in Test := true
 
-javaOptions in Test ++= Seq("-Xms30m","-Xmx30m")
+javaOptions in Test ++= Seq("-Xms30m", "-Xmx30m")
 
 parallelExecution in Test := false
 

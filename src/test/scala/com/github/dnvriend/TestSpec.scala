@@ -22,6 +22,7 @@ import akka.serialization.SerializationExtension
 import akka.stream.{ ActorMaterializer, Materializer }
 import akka.testkit.TestProbe
 import org.scalatest.concurrent.{ Eventually, ScalaFutures }
+import org.scalatest.prop.PropertyChecks
 import org.scalatest.{ BeforeAndAfterAll, Matchers, GivenWhenThen, FlatSpec }
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -29,7 +30,7 @@ import scala.util.Try
 
 import scala.concurrent.duration._
 
-trait TestSpec extends FlatSpec with Matchers with GivenWhenThen with ScalaFutures with BeforeAndAfterAll with Eventually {
+trait TestSpec extends FlatSpec with Matchers with GivenWhenThen with ScalaFutures with BeforeAndAfterAll with Eventually with PropertyChecks {
   implicit val system: ActorSystem = ActorSystem()
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val mat: Materializer = ActorMaterializer()
