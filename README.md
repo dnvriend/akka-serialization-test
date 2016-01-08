@@ -16,8 +16,8 @@ in the companion object of the `Person` which is an `PersistentActor`. The actor
 persistent storage. The serialization method and the details of the persistent storage is unknown to the `PersistentActor`
 which is a good thing.
 
-Using [Akka serialization](http://doc.akka.io/docs/akka/2.4.1/scala/serialization.html), three custom serializers `NameRegisteredSerializer`,
-`NameChangedSerializer`, `SurnameChangedSerializer` are registered in `application.conf`: 
+Using [Akka serialization](http://doc.akka.io/docs/akka/2.4.1/scala/serialization.html), three custom serializers [NameRegisteredSerializer](https://github.com/dnvriend/akka-serialization-test/blob/master/src/main/scala/com/github/dnvriend/serializer/NameRegisteredSerializer.scala),
+[NameChangedSerializer](https://github.com/dnvriend/akka-serialization-test/blob/master/src/main/scala/com/github/dnvriend/serializer/NameChangedSerializer.scala), [SurnameChangedSerializer](https://github.com/dnvriend/akka-serialization-test/blob/master/src/main/scala/com/github/dnvriend/serializer/SurnameChangedSerializer.scala) are registered in `application.conf`: 
 
 ```
 akka {
