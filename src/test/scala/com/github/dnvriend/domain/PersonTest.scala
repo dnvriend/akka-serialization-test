@@ -21,6 +21,7 @@ import akka.persistence.query.PersistenceQuery
 import akka.stream.testkit.scaladsl.TestSink
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.domain.Person._
+import com.github.dnvriend.generator.PersonCommandGenerator
 import com.github.dnvriend.repository.PersonRepository
 
 class PersonTest extends TestSpec {
@@ -31,27 +32,34 @@ class PersonTest extends TestSpec {
 
   "Person" should "register a name" in {
     val person = PersonRepository.forId("person-1")
-    person ! RegisterName("John", "Doe")
+    val xs = PersonCommandGenerator.registerNameCommands
+    xs foreach (person ! _)
 
-    eventsForPersistenceIdSource("person-1")
-      .runWith(TestSink.probe[Any])
-      .request(1)
-      .expectNext(NameRegistered("John", "Doe"))
-      .expectComplete()
+    eventually {
+      eventsForPersistenceIdSource("person-1")
+        .runWith(TestSink.probe[Any])
+        .request(Int.MaxValue)
+        .expectNextN(xs.map(cmd ⇒ NameRegistered(cmd.name, cmd.surname)))
+        .expectComplete()
+    }
 
     cleanup(person)
   }
 
   it should "update its name and surname" in {
-    val person = PersonRepository.forId("person-1")
-    person ! ChangeName("Robin")
-    person ! ChangeSurname("Hood")
+    val person = PersonRepository.forId("person-2")
+    val xs = PersonCommandGenerator.personCommands
+    xs foreach (person ! _)
 
     eventually {
-      eventsForPersistenceIdSource("person-1")
+      eventsForPersistenceIdSource("person-2")
         .runWith(TestSink.probe[Any])
-        .request(3)
-        .expectNext(NameRegistered("John", "Doe"), NameChanged("Robin"), SurnameChanged("Hood"))
+        .request(Int.MaxValue)
+        .expectNextN(xs.map {
+          case RegisterName(name, surname) ⇒ NameRegistered(name, surname)
+          case ChangeName(name)            ⇒ NameChanged(name)
+          case ChangeSurname(surname)      ⇒ SurnameChanged(surname)
+        })
         .expectComplete()
     }
   }

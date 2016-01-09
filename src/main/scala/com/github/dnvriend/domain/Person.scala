@@ -37,7 +37,7 @@ class Person(val persistenceId: String) extends PersistentActor with ActorLoggin
   var name: String = _
   var surname: String = _
 
-  override def receiveRecover: Receive = {
+  override def receiveRecover: Receive = LoggingReceive {
     case e: NameRegistered ⇒ handleEvent(e)
     case e: NameChanged    ⇒ handleEvent(e)
     case e: SurnameChanged ⇒ handleEvent(e)

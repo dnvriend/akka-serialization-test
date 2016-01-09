@@ -20,6 +20,7 @@ import akka.serialization.SerializerWithStringManifest
 import com.github.dnvriend.domain.Person.NameChanged
 
 class NameChangedSerializer extends SerializerWithStringManifest {
+
   import com.github.dnvriend.domain.person.proto._
 
   override def identifier: Int = 101
@@ -29,12 +30,10 @@ class NameChangedSerializer extends SerializerWithStringManifest {
   override def manifest(o: AnyRef): String = o.getClass.getName
 
   override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef =
-    manifest match {
-      case Manifest ⇒
-        val PersonEvents.NameChanged(name) = PersonEvents.NameChanged.parseFrom(bytes)
-        NameChanged(name)
-      case _ ⇒ throw new IllegalArgumentException("Unable to handle manifest: " + manifest)
-    }
+    if (Manifest == manifest) {
+      val PersonEvents.NameChanged(name) = PersonEvents.NameChanged.parseFrom(bytes)
+      NameChanged(name)
+    } else throw new IllegalArgumentException("Unable to handle manifest: " + manifest)
 
   override def toBinary(o: AnyRef): Array[Byte] = o match {
     case NameChanged(name) ⇒
