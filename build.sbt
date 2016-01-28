@@ -52,9 +52,6 @@ headers := Map(
 
 enablePlugins(AutomateHeaderPlugin)
 
-// enable code smell //
-wartremoverWarnings ++= Warts.unsafe
-
 // enable protobuf plugin //
 // see: https://trueaccord.github.io/ScalaPB/sbt-settings.html
 import com.trueaccord.scalapb.{ScalaPbPlugin => PB}
@@ -62,5 +59,6 @@ import com.trueaccord.scalapb.{ScalaPbPlugin => PB}
 PB.protobufSettings
 
 // protoc-jar which is on the sbt classpath //
+// see: https://github.com/os72/protoc-jar
 PB.runProtoc in PB.protobufConfig := (args =>
-  com.github.os72.protocjar.Protoc.runProtoc("-v261" +: args.toArray))
+  com.github.os72.protocjar.Protoc.runProtoc("-v300" +: args.toArray))
