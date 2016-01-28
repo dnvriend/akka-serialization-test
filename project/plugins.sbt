@@ -11,6 +11,12 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-scalariform" % "1.3.0")
 // enable updating file headers eg. for copyright
 addSbtPlugin("de.heikoseeberger" % "sbt-header"      % "1.5.0")
 
+// decode scala errors to human readable form
+addSbtPlugin("com.softwaremill.clippy" % "plugin-sbt" % "0.1")
+
+// find smells in *my* code :)
+addSbtPlugin("org.brianmckenna" % "sbt-wartremover" % "0.14")
+
 // enable compiling *.proto files
 addSbtPlugin("com.trueaccord.scalapb" % "sbt-scalapb" % "0.4.19")
 
