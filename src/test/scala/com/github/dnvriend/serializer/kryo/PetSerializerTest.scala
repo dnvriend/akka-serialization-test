@@ -27,7 +27,7 @@ class PetSerializerTest extends TestSpec {
     serializer.getClass.getName shouldBe "com.twitter.chill.akka.AkkaSerializer"
     val bytes: Array[Byte] = serializer.toBinary(pet)
     bytes.size shouldBe 320 // kryo = 320 bytes, java = 991 bytes
-    println(bytes.toHex())
+    //    println(bytes.toHex())
   }
 
   it should "be deserialized" in withPet() { pet ⇒

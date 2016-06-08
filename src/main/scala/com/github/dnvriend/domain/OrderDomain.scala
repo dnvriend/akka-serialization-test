@@ -16,6 +16,53 @@
 
 package com.github.dnvriend.domain
 
-final case class Item(itemType: String, title: String, price: Double, id: Option[String])
-final case class Address(zipcode: String, houseNumber: Int)
-final case class Order(name: String, address: Address, items: List[Item], date: Long, id: Option[Long])
+import org.json4s.CustomSerializer
+import org.json4s.JsonAST.JString
+
+object OrderDomain {
+  final val CD = ItemType.CD.toString
+  final val DVD = ItemType.DVD.toString
+  final val BluRay = ItemType.BluRay.toString
+  final val Game = ItemType.Game.toString
+
+  case object DirectDebitTypeSerializer extends CustomSerializer[ItemType](_ ⇒ ({
+    case JString(CD)     ⇒ ItemType.CD
+    case JString(DVD)    ⇒ ItemType.DVD
+    case JString(BluRay) ⇒ ItemType.BluRay
+    case JString(Game)   ⇒ ItemType.Game
+  }, {
+    case msg: ItemType ⇒ JString(msg.toString)
+  }))
+
+  type Title = String
+  type Price = Double
+  type ItemId = Option[String]
+
+  type ZipCode = String
+  type HouseNumber = Int
+
+  type OrderName = String
+  type Items = List[Item]
+  type UnixTimestamp = Long
+  type OrderId = Option[String]
+
+  sealed trait ItemType
+  object ItemType {
+    case object CD extends ItemType
+    case object DVD extends ItemType
+    case object BluRay extends ItemType
+    case object Game extends ItemType
+  }
+
+  final case class Item(itemType: ItemType, title: Title, price: Price, id: ItemId)
+  final case class Address(zipcode: ZipCode, houseNumber: HouseNumber)
+  final case class Order(name: OrderName, address: Address, items: Items, date: UnixTimestamp, id: OrderId)
+
+  def withOrder(f: Order ⇒ Order = identity[Order])(g: Order ⇒ Unit): Unit = (g compose f)(Order(
+    name = "",
+    address = Address("", 1),
+    items = List(Item(ItemType.BluRay, "", 25.0, Option("itemId"))),
+    date = 1L,
+    Some("orderId")
+  ))
+}

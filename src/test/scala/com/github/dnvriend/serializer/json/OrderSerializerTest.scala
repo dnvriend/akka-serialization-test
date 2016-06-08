@@ -28,7 +28,8 @@ class OrderSerializerTest extends TestSpec {
     forAll(OrderGenerator.genOrder) { order ⇒
       val serializer: Serializer = serialization.findSerializerFor(order)
       val binary = serializer.toBinary(order)
-      parse(new String(binary)) shouldBe a[JValue]
+      val jsonAst = parse(new String(binary))
+      jsonAst shouldBe a[JValue]
     }
   }
 

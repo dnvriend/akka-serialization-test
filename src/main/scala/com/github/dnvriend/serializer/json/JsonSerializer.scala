@@ -17,16 +17,17 @@
 package com.github.dnvriend.serializer.json
 
 import akka.serialization.Serializer
+import com.github.dnvriend.domain.OrderDomain
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization
 import org.json4s.native.Serialization._
-import org.json4s.{ Formats, NoTypeHints }
+import org.json4s.{ DefaultFormats, Formats, NoTypeHints }
 
 case class EventWrapper(manifest: String, payload: String)
 
 class JsonSerializer extends Serializer {
 
-  implicit val formats: Formats = Serialization.formats(NoTypeHints)
+  implicit val formats: Formats = DefaultFormats + OrderDomain.DirectDebitTypeSerializer
 
   override def identifier: Int = Int.MaxValue
 

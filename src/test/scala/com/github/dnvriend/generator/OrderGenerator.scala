@@ -16,12 +16,12 @@
 
 package com.github.dnvriend.generator
 
-import com.github.dnvriend.domain._
+import com.github.dnvriend.domain.OrderDomain._
 import org.scalacheck.Gen
 
 object OrderGenerator {
 
-  val genItemType = Gen.oneOf("CD", "DVD", "BluRay", "Game")
+  val genItemType = Gen.oneOf(ItemType.CD, ItemType.DVD, ItemType.BluRay, ItemType.Game)
 
   val genItem = for {
     itemType ← genItemType
