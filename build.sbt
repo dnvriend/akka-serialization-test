@@ -8,10 +8,12 @@ scalaVersion := "2.11.8"
 
 resolvers += Resolver.jcenterRepo
 
+
 libraryDependencies ++= {
   val akkaVersion = "2.4.7"
   val json4sVersion = "3.3.0"
   val akkaPersistenceInMemVersion = "1.2.15"
+  val avro4s = "1.4.3"
   Seq(
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
@@ -25,7 +27,9 @@ libraryDependencies ++= {
     "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemVersion % Test,
     "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion % Test,
     "org.scalatest" %% "scalatest" % "2.2.6" % Test,
-    "org.scalacheck" %% "scalacheck" % "1.12.5" % Test
+    "org.scalacheck" %% "scalacheck" % "1.12.5" % Test,
+    "com.sksamuel.avro4s" %% "avro4s-core" % avro4s,
+    "org.apache.avro" % "avro" % "1.7.7"
   )
 }
 

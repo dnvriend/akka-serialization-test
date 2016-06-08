@@ -1,5 +1,5 @@
 # akka-serialization-test
-Study on [akka-serialization][ser] using [Google Protocol Buffers][pb] and [Kryo][kryo].
+Study on [akka-serialization][ser] using [Google Protocol Buffers][pb], [Kryo][kryo] and [Avro][avro]
 
 # TL;DR
 Define domain command and events messages in the companion object of the `PersistentActor` using DDD concepts. 
@@ -82,6 +82,9 @@ extensions for the [Kryo][kryo] serialization library including serializers and 
 ## Kryo Akka Serialization
 [Chill][chill] provides a [Kryo Akka Serializer][chill-akka] out of the box.
 
+## Avro
+Avro serialization/deserialization is done using [avro4s][avro4s] project.
+
 Have fun!
 
 [akka]: http://akka.io/
@@ -94,3 +97,5 @@ Have fun!
 [chill]: https://github.com/twitter/chill
 [chill-akka]: https://github.com/twitter/chill#chill-akka
 [chill-maven-central]: http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.twitter%22%20AND%20a%3A%22chill-akka_2.11%22
+[avro]: https://avro.apache.org/
+[avro4s]: https://github.com/sksamuel/avro4s
