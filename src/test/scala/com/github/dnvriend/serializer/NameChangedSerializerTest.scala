@@ -24,7 +24,7 @@ class NameChangedSerializerTest extends TestSpec {
     val obj = NameChanged("Foo")
     val serializer = serialization.findSerializerFor(obj)
     val bytes: Array[Byte] = serializer.toBinary(obj)
-    bytes shouldBe a[Array[Byte]]
+    bytes.toList should not be 'empty
   }
 
   it should "turn a byte array back into an object" in {

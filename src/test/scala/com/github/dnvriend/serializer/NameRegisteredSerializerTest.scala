@@ -24,7 +24,7 @@ class NameRegisteredSerializerTest extends TestSpec {
     val obj = NameRegistered("Foo", "Bar")
     val serializer = serialization.findSerializerFor(obj)
     val bytes: Array[Byte] = serializer.toBinary(obj)
-    bytes shouldBe a[Array[Byte]]
+    bytes.toList should not be 'empty
   }
 
   it should "unmarshal the protobuf byte array to a protobuf object bypassing the akka serializer" in {

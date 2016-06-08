@@ -16,7 +16,7 @@
 
 package com.github.dnvriend.domain
 
-import akka.persistence.inmemory.query.InMemoryReadJournal
+import akka.persistence.inmemory.query.journal.scaladsl.InMemoryReadJournal
 import akka.persistence.query.PersistenceQuery
 import akka.stream.testkit.scaladsl.TestSink
 import com.github.dnvriend.TestSpec

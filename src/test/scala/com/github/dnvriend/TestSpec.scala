@@ -16,18 +16,17 @@
 
 package com.github.dnvriend
 
-import akka.actor.{ ActorRef, PoisonPill, ActorSystem }
-import akka.event.{ LoggingAdapter, Logging }
+import akka.actor.{ ActorRef, ActorSystem, PoisonPill }
+import akka.event.{ Logging, LoggingAdapter }
 import akka.serialization.SerializationExtension
 import akka.stream.{ ActorMaterializer, Materializer }
 import akka.testkit.TestProbe
 import org.scalatest.concurrent.{ Eventually, ScalaFutures }
 import org.scalatest.prop.PropertyChecks
-import org.scalatest.{ BeforeAndAfterAll, Matchers, GivenWhenThen, FlatSpec }
+import org.scalatest.{ BeforeAndAfterAll, FlatSpec, GivenWhenThen, Matchers }
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
-
 import scala.concurrent.duration._
 
 trait TestSpec extends FlatSpec with Matchers with GivenWhenThen with ScalaFutures with BeforeAndAfterAll with Eventually with PropertyChecks {
@@ -47,10 +46,10 @@ trait TestSpec extends FlatSpec with Matchers with GivenWhenThen with ScalaFutur
    */
   def cleanup(actors: ActorRef*): Unit = {
     val probe = TestProbe()
-    actors.foreach { (actor: ActorRef) ⇒
-      actor ! PoisonPill
+    actors.foreach { actor ⇒
       probe watch actor
-      probe.expectTerminated(actor)
+      actor ! PoisonPill
+      probe expectTerminated actor
     }
   }
 

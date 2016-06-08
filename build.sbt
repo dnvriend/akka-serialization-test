@@ -4,26 +4,33 @@ organization := "com.github.dnvriend"
 
 version := "1.0.0"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
-resolvers += "dnvriend at bintray" at "http://dl.bintray.com/dnvriend/maven"
+resolvers += Resolver.jcenterRepo
 
 libraryDependencies ++= {
-  val akkaVersion = "2.4.2-RC1"
+  val akkaVersion = "2.4.7"
+  val json4sVersion = "3.3.0"
+  val akkaPersistenceInMemVersion = "1.2.15"
   Seq(
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
     "com.typesafe.akka" %% "akka-persistence" % akkaVersion,
     "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-    "org.json4s" %% "json4s-native" % "3.2.10",
-    "com.github.dnvriend" %% "akka-persistence-inmemory" % "1.2.1" % Test,
+    "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+    "ch.qos.logback" % "logback-classic" % "1.1.3",
+    "org.json4s" %% "json4s-native" % json4sVersion,
+    "org.scalaz" %% "scalaz-core" % "7.2.3",
+    "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemVersion % Test,
     "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion % Test,
-    "org.scalatest" %% "scalatest" % "2.2.4" % Test,
+    "org.scalatest" %% "scalatest" % "2.2.6" % Test,
     "org.scalacheck" %% "scalacheck" % "1.12.5" % Test
   )
 }
 
 fork in Test := true
+
+scalacOptions ++= Seq("-feature", "-language:higherKinds", "-language:implicitConversions", "-deprecation", "-Ybackend:GenBCode", "-Ydelambdafy:method", "-target:jvm-1.8")
 
 javaOptions in Test ++= Seq("-Xms30m", "-Xmx30m")
 
@@ -33,10 +40,10 @@ licenses +=("Apache-2.0", url("http://opensource.org/licenses/apache2.0.php"))
 
 // enable scala code formatting //
 import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform
 
-scalariformSettings
-
-ScalariformKeys.preferences := ScalariformKeys.preferences.value
+// Scalariform settings
+SbtScalariform.autoImport.scalariformPreferences := SbtScalariform.autoImport.scalariformPreferences.value
   .setPreference(AlignSingleLineCaseStatements, true)
   .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 100)
   .setPreference(DoubleIndentClassDeclaration, true)
