@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.domain
+package com.github.dnvriend.implicits
 
-final case class Item(itemType: String, title: String, price: Double, id: Option[String])
-final case class Address(zipcode: String, houseNumber: Int)
-final case class Order(name: String, address: Address, items: List[Item], date: Long, id: Option[Long])
+object ArrayOps {
+
+  implicit class ArrayOps(val arr: Array[Byte]) extends AnyVal {
+    def toHex(sep: String = ""): String = arr.map("%02x".format(_)).mkString(sep)
+  }
+
+}

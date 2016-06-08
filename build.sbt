@@ -18,6 +18,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-persistence" % akkaVersion,
     "com.typesafe.akka" %% "akka-stream" % akkaVersion,
     "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+    "com.twitter" %% "chill-akka" % "0.8.0",
     "ch.qos.logback" % "logback-classic" % "1.1.3",
     "org.json4s" %% "json4s-native" % json4sVersion,
     "org.scalaz" %% "scalaz-core" % "7.2.3",

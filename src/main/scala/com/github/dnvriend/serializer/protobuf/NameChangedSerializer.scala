@@ -14,37 +14,29 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.serializer
+package com.github.dnvriend.serializer.protobuf
 
 import akka.serialization.SerializerWithStringManifest
-import com.github.dnvriend.domain.Person.NameRegistered
+import com.github.dnvriend.domain.Person.NameChanged
 
-/**
- * The PersonCreated serializer does the following:
- * <ul>
- * <li>Uses the case class as identifier for the manifest</li>
- * <li>It will receive a case class in the `toBinary` method, and maps it to a protobuf type that will be mapped to a byte array</li>
- * <li>The format stored in the journal is a protobuf byte array, it must be mapped to a protobuf type and then to a case class</li>
- * </ul>
- */
-class NameRegisteredSerializer extends SerializerWithStringManifest {
+class NameChangedSerializer extends SerializerWithStringManifest {
 
   import com.github.dnvriend.domain.person.proto._
 
-  override def identifier: Int = 100
+  override def identifier: Int = 101
 
-  final val Manifest = classOf[NameRegistered].getName
+  final val Manifest = classOf[NameChanged].getName
 
   override def manifest(o: AnyRef): String = o.getClass.getName
 
   override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef =
     if (Manifest == manifest) {
-      val PersonEvents.NameRegistered(name, surname) = PersonEvents.NameRegistered.parseFrom(bytes)
-      NameRegistered(name, surname)
+      val PersonEvents.NameChanged(name) = PersonEvents.NameChanged.parseFrom(bytes)
+      NameChanged(name)
     } else throw new IllegalArgumentException("Unable to handle manifest: " + manifest)
 
   override def toBinary(o: AnyRef): Array[Byte] = o match {
-    case NameRegistered(name, surname) ⇒
-      PersonEvents.NameRegistered(name, surname).toByteArray
+    case NameChanged(name) ⇒
+      PersonEvents.NameChanged(name).toByteArray
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.serializer
+package com.github.dnvriend.serializer.protobuf
 
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.domain.Person.NameChanged

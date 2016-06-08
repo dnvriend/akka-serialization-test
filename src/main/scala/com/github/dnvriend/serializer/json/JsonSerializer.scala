@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.serializer
+package com.github.dnvriend.serializer.json
 
 import akka.serialization.Serializer
 import org.json4s.native.JsonMethods._

@@ -1,5 +1,5 @@
 # akka-serialization-test
-Study on [akka-serialization](http://doc.akka.io/docs/akka/2.4.1/scala/serialization.html) using [Google Protocol Buffers](https://developers.google.com/protocol-buffers/docs/overview).
+Study on [akka-serialization][ser] using [Google Protocol Buffers][pb] and [Kryo][kryo].
 
 # TL;DR
 Define domain command and events messages in the companion object of the `PersistentActor` using DDD concepts. 
@@ -9,14 +9,14 @@ Register the custom serializers and domain event case classes in `application.co
 done transparently.
 
 # Overview
-[Akka serialization](http://doc.akka.io/docs/akka/2.4.1/scala/serialization.html) is a good way for domain messages
+[Akka serialization][ser] is a good way for domain messages
 like commands and events to be serialized to a format of choice. In this example, the domain messages are defined
 in the companion object of the `Person` which is an `PersistentActor`. The actor handles commands like `RegisterName`,
 `ChangeName` and `ChangeSurname`, and stores events like `NameRegisted`, `NameChanged` and `SurnameChanged` to 
 persistent storage. The serialization method and the details of the persistent storage is unknown to the `PersistentActor`
 which is a good thing.
 
-Using [Akka serialization](http://doc.akka.io/docs/akka/2.4.1/scala/serialization.html), three custom serializers [NameRegisteredSerializer](https://github.com/dnvriend/akka-serialization-test/blob/master/src/main/scala/com/github/dnvriend/serializer/NameRegisteredSerializer.scala),
+Using [Akka serialization][ser], three custom serializers [NameRegisteredSerializer](https://github.com/dnvriend/akka-serialization-test/blob/master/src/main/scala/com/github/dnvriend/serializer/NameRegisteredSerializer.scala),
 [NameChangedSerializer](https://github.com/dnvriend/akka-serialization-test/blob/master/src/main/scala/com/github/dnvriend/serializer/NameChangedSerializer.scala), [SurnameChangedSerializer](https://github.com/dnvriend/akka-serialization-test/blob/master/src/main/scala/com/github/dnvriend/serializer/SurnameChangedSerializer.scala) are registered in `application.conf`: 
 
 ```
@@ -59,7 +59,7 @@ the knowledge to interpret the `Array[Byte]`. When the `Array[Byte]` is actually
 converted into a string, then the fields must be parsed, and then an object must be created, because the serializer 
 must return an `AnyRef` type when it unmarshals the `Array[Byte]`.
 
-The three custom serializers use [Google Protocol Buffers](https://developers.google.com/protocol-buffers/docs/overview),
+The three custom serializers use [Google Protocol Buffers][pb],
 so the `Array[Byte]` that the persistent storage will store is actually a protobuf object.
 
 # The example
@@ -72,4 +72,25 @@ The example project shows the following:
 * How to test the Person domain object
 * How to test the custom serializers.
 
+# Kryo, Twitter Chill and Akka
+[Kryo][kryo] is a fast and efficient object graph serialization framework for Java. The goals of the project are speed, 
+efficiency, and an easy to use API. The project is useful any time objects need to be persisted, whether to a file, database, 
+or over the network. To be able to use Kryo effectively on [Scala][scala], I will be using [Twitter's Chill][chill] which provides 
+extensions for the [Kryo][kryo] serialization library including serializers and a set of classes to ease configuration of 
+[Kryo][kryo] in systems like [Hadoop][hadoop], [Storm][storm], [Akka][akka] and is available on [maven-central][chill-maven-central].
+ 
+## Kryo Akka Serialization
+[Chill][chill] provides a [Kryo Akka Serializer][chill-akka] out of the box.
+
 Have fun!
+
+[akka]: http://akka.io/
+[hadoop]: http://hadoop.apache.org/
+[storm]: http://storm.apache.org/
+[ser]: http://doc.akka.io/docs/akka/2.4.7/scala/serialization.html
+[pb]: https://developers.google.com/protocol-buffers/docs/overview
+[kryo]: https://github.com/EsotericSoftware/kryo
+[scala]: http://www.scala-lang.org/
+[chill]: https://github.com/twitter/chill
+[chill-akka]: https://github.com/twitter/chill#chill-akka
+[chill-maven-central]: http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.twitter%22%20AND%20a%3A%22chill-akka_2.11%22

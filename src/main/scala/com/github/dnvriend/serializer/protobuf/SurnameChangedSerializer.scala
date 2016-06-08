@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.serializer
+package com.github.dnvriend.serializer.protobuf
 
 import akka.serialization.SerializerWithStringManifest
-import com.github.dnvriend.domain.Person.NameChanged
+import com.github.dnvriend.domain.Person.SurnameChanged
 
-class NameChangedSerializer extends SerializerWithStringManifest {
+class SurnameChangedSerializer extends SerializerWithStringManifest {
 
   import com.github.dnvriend.domain.person.proto._
 
-  override def identifier: Int = 101
+  override def identifier: Int = 102
 
-  final val Manifest = classOf[NameChanged].getName
+  final val Manifest = classOf[SurnameChanged].getName
 
   override def manifest(o: AnyRef): String = o.getClass.getName
 
   override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef =
     if (Manifest == manifest) {
-      val PersonEvents.NameChanged(name) = PersonEvents.NameChanged.parseFrom(bytes)
-      NameChanged(name)
+      val PersonEvents.SurnameChanged(surname) = PersonEvents.SurnameChanged.parseFrom(bytes)
+      SurnameChanged(surname)
     } else throw new IllegalArgumentException("Unable to handle manifest: " + manifest)
 
   override def toBinary(o: AnyRef): Array[Byte] = o match {
-    case NameChanged(name) ⇒
-      PersonEvents.NameChanged(name).toByteArray
+    case SurnameChanged(surname) ⇒
+      PersonEvents.SurnameChanged(surname).toByteArray
   }
 }
