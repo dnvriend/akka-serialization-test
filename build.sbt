@@ -2,12 +2,11 @@ name := "akka-serialization-test"
 
 organization := "com.github.dnvriend"
 
-version := "1.0.0"
+version := "1.0.1"
 
 scalaVersion := "2.11.8"
 
 resolvers += Resolver.jcenterRepo
-
 
 libraryDependencies ++= {
   val akkaVersion = "2.4.7"

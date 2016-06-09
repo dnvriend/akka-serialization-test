@@ -2,11 +2,11 @@
 Study on [akka-serialization][ser] using [Google Protocol Buffers][pb], [Kryo][kryo] and [Avro][avro]
 
 # TL;DR
-Define domain command and events messages in the companion object of the `PersistentActor` using DDD concepts. 
-Define protobuf messages in the .proto file that will be written to persistent storage using Akka Persistence. 
-Create Akka `SerializerWithStringManifest` that map event case classes to and from protobuf classes.
-Register the custom serializers and domain event case classes in `application.conf` so the serialization will be
-done transparently.
+Define domain command and events messages in the companion object of the `PersistentActor` using DDD concepts.
+Configure the serialization library you wish to use, looking at the examples. Register the serializer to use 
+in `application.conf` in the path `akka.actor.serializers` and register the classes to bind to a certain serializer in the path 
+`akka.actor.serialization-bindings`. When the serializer and bindings have been configured, Akka serialization will transparently 
+serialize/deserialize messages.
 
 # Overview
 [Akka serialization][ser] is a good way for domain messages
@@ -82,15 +82,39 @@ extensions for the [Kryo][kryo] serialization library including serializers and 
 ## Kryo Akka Serialization
 [Chill][chill] provides a [Kryo Akka Serializer][chill-akka] out of the box.
 
-## Avro
-Avro serialization/deserialization is done using [avro4s][avro4s] project.
+## Apache Avro
+[Avro][avro-wiki] is a remote procedure call and data serialization framework developed within Apache's Hadoop project. 
+It uses JSON for defining data types and protocols, and serializes data in a compact binary format. Its primary use is 
+in Apache Hadoop, where it can provide both a serialization format for persistent data, and a wire format for communication 
+between Hadoop nodes, and from client programs to the Hadoop services.
+
+It is similar to [Thrift][thrift-wiki], but does not require running a code-generation program when a schema changes 
+(unless desired for statically-typed languages).
+
+We will be using [Stephen Samuel's][sksamuel] (also known for [Elastic4s][elastic4s], a non-blocking, type safe DSL and Scala client for Elasticsearch),
+[Avro4s][avro4s] project, which is a schema/class generation and serializing/deserializing library for Avro written in Scala. The objective of [Avro4s][avro4s] 
+is to allow seamless use with Scala without the need to to write boilerplate conversions yourself, and without the runtime overhead of reflection. 
+Hence, this is a _macro based_ library and generates code for use with Avro at compile time.
+
+## Apache Thrift
+_not yet available_
+
+# What's new?
+## 1.0.1 (2016-06-08)
+  - Merged PR #1 [Giampaolo Trapasso][trapasso] Added Apache Avro serialization example, thanks!
+
+## 1.0.0 (2016-06-07)
+  - Added Kryo serialization example
 
 Have fun!
+
+[trapasso]: https://github.com/giampaolotrapasso
+[sksamuel]: https://github.com/sksamuel
 
 [akka]: http://akka.io/
 [hadoop]: http://hadoop.apache.org/
 [storm]: http://storm.apache.org/
-[ser]: http://doc.akka.io/docs/akka/2.4.7/scala/serialization.html
+[ser]: http://doc.akka.io/docs/akka/current/scala/serialization.html
 [pb]: https://developers.google.com/protocol-buffers/docs/overview
 [kryo]: https://github.com/EsotericSoftware/kryo
 [scala]: http://www.scala-lang.org/
@@ -98,4 +122,7 @@ Have fun!
 [chill-akka]: https://github.com/twitter/chill#chill-akka
 [chill-maven-central]: http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.twitter%22%20AND%20a%3A%22chill-akka_2.11%22
 [avro]: https://avro.apache.org/
+[avro-wiki]: https://en.wikipedia.org/wiki/Apache_Avro
 [avro4s]: https://github.com/sksamuel/avro4s
+[elastic4s]: https://github.com/sksamuel/elastic4s
+[thrift-wiki]: https://en.wikipedia.org/wiki/Apache_Thrift
