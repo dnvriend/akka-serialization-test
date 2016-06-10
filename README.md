@@ -1,4 +1,6 @@
 # akka-serialization-test
+
+[![Join the chat at https://gitter.im/dnvriend/akka-serialization-test](https://badges.gitter.im/dnvriend/akka-serialization-test.svg)](https://gitter.im/dnvriend/akka-serialization-test?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Study on [akka-serialization][ser] using [Google Protocol Buffers][pb], [Kryo][kryo] and [Avro][avro]
 
 # TL;DR
