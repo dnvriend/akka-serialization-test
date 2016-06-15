@@ -26,7 +26,7 @@ import org.apache.avro.generic.{ GenericDatumReader, GenericRecord }
 import org.apache.avro.io.DecoderFactory
 import com.sksamuel.avro4s.AvroSchema
 
-class AvroChangeVersionTest extends TestSpec {
+class AvroChangeSchemaTest extends TestSpec {
 
   @Override
   def fromBytes(bytes: Array[Byte], schema: Schema): GenericRecord = {
