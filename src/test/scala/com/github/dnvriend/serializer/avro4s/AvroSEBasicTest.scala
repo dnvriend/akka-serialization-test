@@ -25,7 +25,8 @@ import org.apache.avro.file.SeekableByteArrayInput
 import org.apache.avro.generic.{ GenericDatumReader, GenericRecord }
 import org.apache.avro.io.DecoderFactory
 
-class AvroChangeSchemaTest extends TestSpec {
+// SE stands for Schema Evolution
+class AvroSEBasicTest extends TestSpec {
 
   @Override
   def fromBytes(bytes: Array[Byte], schema: Schema): GenericRecord = {
@@ -37,7 +38,7 @@ class AvroChangeSchemaTest extends TestSpec {
   val year = 1851
   val editor = "Scala Books"
 
-  "ChangeVersionTest" should "deserialize old class with renamed field" in {
+  "AvroSEBasicTest" should "deserialize old class with renamed field" in {
     // in this case, two different serializers can be used
 
     val obj = ChangedBookV1(title, year)
