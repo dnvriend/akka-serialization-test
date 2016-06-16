@@ -35,7 +35,7 @@ class SongAddedSerializerTest extends TestSpec {
     val bytes = serializer.toBinary(obj)
 
     serializer.fromBinary(bytes, Option(obj.getClass)) should matchPattern {
-      case SongAdded(Song("Money", x)) if (x.isInstanceOf[Duration]) ⇒
+      case SongAdded(Song("Money", x: Duration)) ⇒
     }
   }
 }

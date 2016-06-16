@@ -46,7 +46,7 @@ class AvroChangeSchemaTest extends TestSpec {
     val serializerV2 = new BookSerializerV2
 
     serializerV2.fromBinary(bytes) should matchPattern {
-      case ChangedBookV2(x, y) if x == title && y == year ⇒
+      case ChangedBookV2(`title`, `year`) ⇒
     }
   }
 
@@ -68,7 +68,7 @@ class AvroChangeSchemaTest extends TestSpec {
     val r = format.from(record)
 
     r should matchPattern {
-      case ChangedBookV3(t, y, e) if t == title && y == year && e == "" ⇒
+      case ChangedBookV3(`title`, `year`, "") ⇒
     }
 
   }
@@ -91,7 +91,7 @@ class AvroChangeSchemaTest extends TestSpec {
     val r = format.from(record)
 
     r should matchPattern {
-      case ChangedBookV4(t, e) if t == title && e == editor ⇒
+      case ChangedBookV4(`title`, `editor`) ⇒
     }
 
   }
