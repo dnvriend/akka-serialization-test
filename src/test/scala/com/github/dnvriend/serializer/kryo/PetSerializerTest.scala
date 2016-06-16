@@ -19,7 +19,6 @@ package com.github.dnvriend.serializer.kryo
 import akka.persistence.PersistentRepr
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.domain.PetDomain._
-import com.github.dnvriend.implicits.ArrayOps._
 
 class PetSerializerTest extends TestSpec {
   "Pet" should "be serialized to a byte array" in withPet() { pet ⇒

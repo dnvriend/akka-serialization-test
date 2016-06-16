@@ -19,7 +19,7 @@ package com.github.dnvriend.serializer.avro4s
 import java.time.Duration
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.domain.Music.{ SongAdded, Song }
+import com.github.dnvriend.domain.Music.{ Song, SongAdded }
 
 class SongAddedSerializerTest extends TestSpec {
   "SongAdded" should "be serialized to a byte array" in {

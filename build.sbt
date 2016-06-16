@@ -2,7 +2,7 @@ name := "akka-serialization-test"
 
 organization := "com.github.dnvriend"
 
-version := "1.0.1"
+version := "1.0.2"
 
 scalaVersion := "2.11.8"
 

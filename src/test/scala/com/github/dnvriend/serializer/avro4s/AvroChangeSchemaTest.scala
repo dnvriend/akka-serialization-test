@@ -17,22 +17,20 @@
 package com.github.dnvriend.serializer.avro4s
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.domain.BookStore.{ ChangedBookV4, ChangedBookV1, ChangedBookV2, ChangedBookV3 }
-import com.github.dnvriend.serializer.avro.{ BookSerializerV3, BookSerializerV1, BookSerializerV2 }
-import com.sksamuel.avro4s.RecordFormat
+import com.github.dnvriend.domain.BookStore.{ ChangedBookV1, ChangedBookV2, ChangedBookV3, ChangedBookV4 }
+import com.github.dnvriend.serializer.avro.{ BookSerializerV1, BookSerializerV2, BookSerializerV3 }
+import com.sksamuel.avro4s.{ AvroSchema, RecordFormat }
 import org.apache.avro.Schema
 import org.apache.avro.file.SeekableByteArrayInput
 import org.apache.avro.generic.{ GenericDatumReader, GenericRecord }
 import org.apache.avro.io.DecoderFactory
-import com.sksamuel.avro4s.AvroSchema
 
 class AvroChangeSchemaTest extends TestSpec {
 
   @Override
   def fromBytes(bytes: Array[Byte], schema: Schema): GenericRecord = {
-    val serveReader = new GenericDatumReader[GenericRecord](schema);
-    serveReader.read(null, DecoderFactory.get().binaryDecoder(bytes, null));
-
+    val serveReader = new GenericDatumReader[GenericRecord](schema)
+    serveReader.read(null, DecoderFactory.get().binaryDecoder(bytes, null))
   }
 
   val title = "Moby-Dick; or, The Whale"
