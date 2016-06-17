@@ -16,191 +16,153 @@
 
 package com.github.dnvriend.serializer.avro4s
 
-import com.github.dnvriend.TestSpec
-import com.github.dnvriend.domain.BookStore.ChangedBookV4
-import com.github.dnvriend.domain.Movie.{ Country, Year, MovieChanged }
-import com.github.dnvriend.serializer.avro.{ MovieChangedSerializer, BookSerializerV1 }
-import com.sksamuel.avro4s.{ RecordFormat, AvroSchema }
-import com.typesafe.sslconfig.Base64
-import org.apache.avro.Schema
-import org.apache.avro.file.SeekableByteArrayInput
-import org.apache.avro.generic.{ GenericDatumReader, GenericRecord }
-import org.apache.avro.io.DecoderFactory
+class AvroSENoOldClassesTest extends AvroTestSpec {
 
-class AvroSENoOldClassesTest extends TestSpec {
-
-  // this corresponds to MovieChanged("Eternal sunshine of a spotless mind", 2014)
-  // converted to base64 using rfc2045
-  //
-  //    val bytes: Array[Byte] = serializerV1.toBinary(MovieChanged("Eternal sunshine of a spotless mind", 2014))
-  //    val s = Base64.rfc2045.encodeToString(bytes, false)
-  //
-  val version1 = "RkV0ZXJuYWwgc3Vuc2hpbmUgb2YgYSBzcG90bGVzcyBtaW5kvB8="
-  // this is the corresponding schema
-  val schema1 =
-    """
-      |{
-      |  "type" : "record",
-      |  "name" : "MovieChanged",
-      |  "namespace" : "com.github.dnvriend.domain",
-      |  "fields" : [ {
-      |    "name" : "title",
-      |    "type" : "string"
-      |  }, {
-      |    "name" : "year",
-      |    "type" : "int"
-      |  } ]
-      |}
-    """.stripMargin
-
-  // this corresponds to MovieChanged("Eternal sunshine of a spotless mind", 2014, "Michel Gondry")
-  val version2 = "RkV0ZXJuYWwgc3Vuc2hpbmUgb2YgYSBzcG90bGVzcyBtaW5kvB8aTWljaGVsIEdvbmRyeQ=="
-  val schema2 =
-    """
-      |{
-      |  "type" : "record",
-      |  "name" : "MovieChanged",
-      |  "namespace" : "com.github.dnvriend.domain",
-      |  "fields" : [ {
-      |    "name" : "title",
-      |    "type" : "string"
-      |  }, {
-      |    "name" : "year",
-      |    "type" : "int"
-      |  }, {
-      |    "name" : "director",
-      |    "type" : "string",
-      |    "default" : "unknown"
-      |  } ]
-      |}
-      |
-    """.stripMargin
-
-  // this corresponds to MovieChanged("Eternal sunshine of a spotless mind", 2014, "Michel Gondry")
-  val version3 = "RkV0ZXJuYWwgc3Vuc2hpbmUgb2YgYSBzcG90bGVzcyBtaW5kvB8aTWljaGVsIEdvbmRyeQ=="
-  val schema3 =
-    """
-      |{
-      |  "type" : "record",
-      |  "name" : "MovieChanged",
-      |  "namespace" : "com.github.dnvriend.domain",
-      |  "fields" : [ {
-      |    "name" : "title",
-      |    "type" : "string"
-      |  }, {
-      |    "name" : "release_year",
-      |    "type" : "int"
-      |  }, {
-      |    "name" : "director",
-      |    "type" : "string",
-      |    "default" : "unknown"
-      |  }
-    """.stripMargin
-
-  // this corresponds to MovieChanged("Eternal sunshine of a spotless mind", "Michel Gondry", 1)
-  val version4 = "RkV0ZXJuYWwgc3Vuc2hpbmUgb2YgYSBzcG90bGVzcyBtaW5kGk1pY2hlbCBHb25kcnkC"
-  val schema4 =
-    """
-      |{
-      |  "type" : "record",
-      |  "name" : "MovieChanged",
-      |  "namespace" : "com.github.dnvriend.domain",
-      |  "fields" : [ {
-      |    "name" : "title",
-      |    "type" : "string"
-      |  }, {
-      |    "name" : "director",
-      |    "type" : "string",
-      |    "default" : "unknown"
-      |  }, {
-      |    "name" : "wonOscars",
-      |    "type" : "int",
-      |    "default" : "0"
-      |  } ]
-      |
-    """.stripMargin
-
-  // this corresponds to
-  // MovieChanged("Eternal sunshine of a spotless mind",
-  //              "Michel Gondry",
-  //              1,
-  //              Map("Italy" → 2004, "Japan" → 2005))
-  //
-  val version5 = "RkV0ZXJuYWwgc3Vuc2hpbmUgb2YgYSBzcG90bGVzcyBtaW5kGk1pY2hlbCBHb25kcnkCBApJdGFseagfCkphcGFuqh8A"
-  val schema5 =
-    """
-      |{
-      |  "type" : "record",
-      |  "name" : "MovieChanged",
-      |  "namespace" : "com.github.dnvriend.domain",
-      |  "fields" : [ {
-      |    "name" : "title",
-      |    "type" : "string"
-      |  }, {
-      |    "name" : "director",
-      |    "type" : "string",
-      |    "default" : "unknown"
-      |  }, {
-      |    "name" : "wonOscars",
-      |    "type" : "int",
-      |    "default" : 0
-      |  }, {
-      |    "name" : "releases",
-      |    "type" : {
-      |      "type" : "map",
-      |      "values" : "int"
-      |    }
-      |  } ]
-      |}
-      |
-    """.stripMargin
-
-  @Override
-  def fromBytes(bytes: Array[Byte], schema: Schema): GenericRecord = {
-    val serveReader = new GenericDatumReader[GenericRecord](schema)
-    serveReader.read(null, DecoderFactory.get().binaryDecoder(bytes, null))
+  "String" should "encode to base64" in {
+    val encoder = implicitly[Encoder[Array[Byte], String]]
+    val base64String = encoder.encode("Hello World!".getBytes())
+    base64String shouldBe "SGVsbG8gV29ybGQh"
   }
 
-  "AvroSENoOldClassesTest" should "deserialize old class with renamed field" in {
-    val title = "Eternal sunshine of a spotless mind"
-    val year = 2014
-    val director = "Michel Gondry"
-    val oscars = 1
-    val releases: Map[Country, Year] = Map("Italy" → 2004, "Japan" → 2005)
+  it should "decode from base64" in {
+    val decoder = implicitly[Decoder[String, Array[Byte]]]
+    new String(decoder.decode("SGVsbG8gV29ybGQh")) shouldBe "Hello World!"
+  }
 
-    val current: Schema = new (Schema.Parser).parse(schema5)
+  "MovieChangedV1" should "encode to base64" in {
+    val event = MovieChangedV1("foo", 1990)
+    val encoder = implicitly[Encoder[MovieChangedV1, String]]
+    val base64String = encoder.encode(event)
+    base64String shouldBe "BmZvb4wf"
+  }
 
-    val objects = List(version1
-    //, version2, version3, version4, version5
-    ).map(Base64.rfc2045.decode)
-    val schemas = List(
-      schema1
-    // schema2,
-    // schema3,
-    // schema4,
-    // schema5
-    ).map(x ⇒ new (Schema.Parser).parse(x))
+  it should "decode from base64" in {
+    val decoder = implicitly[Decoder[String, MovieChangedV1]]
+    decoder.decode("BmZvb4wf") shouldBe MovieChangedV1("foo", 1990)
+  }
 
-    val zip = objects.zip(schemas)
+  "MovieChangedV2" should "encode to base64" in {
+    val event = MovieChangedV2("foo", 1990, "bar")
+    val encoder = implicitly[Encoder[MovieChangedV2, String]]
+    val base64String = encoder.encode(event)
+    base64String shouldBe "BmZvb4wfBmJhcg=="
+  }
 
-    val deserialized: List[MovieChanged] = zip map {
-      case (bytes, schema) ⇒
-        val gdr = new GenericDatumReader[GenericRecord](schema, current)
-        val in = new SeekableByteArrayInput(bytes)
-        val binDecoder = DecoderFactory.get().binaryDecoder(in, null)
-        val record: GenericRecord = gdr.read(null, binDecoder)
-        val format = RecordFormat[MovieChanged]
-        format.from(record)
-    }
+  it should "decode from base64" in {
+    val decoder = implicitly[Decoder[String, MovieChangedV2]]
+    decoder.decode("BmZvb4wfBmJhcg==") shouldBe MovieChangedV2("foo", 1990, "bar")
+  }
 
-    forAll(deserialized) {
-      movieChanged ⇒
-        movieChanged should matchPattern {
-          case MovieChanged(`title`, dir, wonOscar, rel) if Set("unknown", director).contains(dir) &&
-            Set(0, oscars).contains(wonOscar) &&
-            Set(Map[Country, Year](), releases).contains(rel) ⇒
-        }
-    }
+  "MovieChangedV3" should "encode to base64" in {
+    val event = MovieChangedV3("foo", 1990, "bar")
+    val encoder = implicitly[Encoder[MovieChangedV3, String]]
+    val base64String = encoder.encode(event)
+    base64String shouldBe "BmZvb4wfBmJhcg=="
+  }
 
+  it should "decode from base64" in {
+    val decoder = implicitly[Decoder[String, MovieChangedV3]]
+    decoder.decode("BmZvb4wfBmJhcg==") shouldBe MovieChangedV3("foo", 1990, "bar")
+  }
+
+  "v1 to v2" should "decode with format" in {
+    val decoder = implicitly[Decoder[AvroCommand, MovieChangedV2]]
+    decoder.decode(AvroCommand(
+      "BmZvb4wf",
+      oldSchema =
+        """
+            |{
+            |  "type" : "record",
+            |  "name" : "MovieChanged",
+            |  "version" : 1,
+            |  "namespace" : "com.github.dnvriend.serializer.avro4s",
+            |  "fields" : [
+            |   { "name" : "title", "type" : "string" },
+            |   { "name" : "year", "type" : "int" }
+            |  ]
+            |}
+          """.stripMargin.toSchema,
+      newSchema =
+        """
+          |{
+          |  "type" : "record",
+          |  "name" : "MovieChanged",
+          |  "version" : 2,
+          |  "namespace" : "com.github.dnvriend.serializer.avro4s",
+          |  "fields" : [
+          |   { "name" : "title", "type" : "string" },
+          |   { "name" : "year", "type" : "int" },
+          |   { "name" : "director", "type" : "string", "default" : "unknown" }
+          |  ]
+          |}
+        """.stripMargin.toSchema
+    )) shouldBe MovieChangedV2("foo", 1990, "unknown")
+  }
+
+  "v2 to v3" should "decode with format" in {
+    val decoder = implicitly[Decoder[AvroCommand, MovieChangedV3]]
+    decoder.decode(AvroCommand(
+      "BmZvb4wfBmJhcg==",
+      oldSchema = """
+        |{
+        |  "type" : "record",
+        |  "name" : "MovieChanged",
+        |  "version" : 2,
+        |  "namespace" : "com.github.dnvriend.serializer.avro4s",
+        |  "fields" : [
+        |   { "name" : "title", "type" : "string" },
+        |   { "name" : "year", "type" : "int" },
+        |   { "name" : "director", "type" : "string" }
+        |  ]
+        |}
+      """.stripMargin.toSchema,
+      newSchema = """
+        |{
+        |  "type" : "record",
+        |  "name" : "MovieChanged",
+        |  "version" : 3,
+        |  "namespace" : "com.github.dnvriend.serializer.avro4s",
+        |  "fields" : [
+        |   { "name" : "title", "type" : "string"},
+        |   { "name" : "released_year", "type" : "int", "aliases" : ["year"] },
+        |   { "name" : "director", "type" : "string"}
+        |  ]
+        |}
+      """.stripMargin.toSchema
+    )) shouldBe MovieChangedV3("foo", 1990, "bar")
+  }
+
+  "v1 to v3" should "decode with format" in {
+    val decoder = implicitly[Decoder[AvroCommand, MovieChangedV3]]
+    decoder.decode(AvroCommand(
+      "BmZvb4wf",
+      oldSchema =
+        """
+        |{
+        |  "type" : "record",
+        |  "name" : "MovieChanged",
+        |  "version" : 1,
+        |  "namespace" : "com.github.dnvriend.serializer.avro4s",
+        |  "fields" : [
+        |   { "name" : "title", "type" : "string" },
+        |   { "name" : "year", "type" : "int" }
+        |  ]
+        |}
+      """.stripMargin.toSchema,
+      newSchema =
+        """
+        |{
+        |  "type" : "record",
+        |  "name" : "MovieChanged",
+        |  "version" : 3,
+        |  "namespace" : "com.github.dnvriend.serializer.avro4s",
+        |  "fields" : [
+        |   { "name" : "title", "type" : "string"},
+        |   { "name" : "released_year", "type" : "int", "aliases" : ["year"] },
+        |   { "name" : "director", "type" : "string", "default" : "unknown" }
+        |  ]
+        |}
+      """.stripMargin.toSchema
+    )) shouldBe MovieChangedV3("foo", 1990, "unknown")
   }
 }
