@@ -68,8 +68,8 @@ class AvroSENoOldClassesTest extends AvroTestSpec {
   }
 
   "v1 to v2" should "decode with format" in {
-    val decoder = implicitly[Decoder[AvroCommand, MovieChangedV2]]
-    decoder.decode(AvroCommand(
+    val decoder = implicitly[Decoder[AvroSchemaEvolution, MovieChangedV2]]
+    decoder.decode(AvroSchemaEvolution(
       Base64("BmZvb4wf"),
       oldSchema =
         """
@@ -102,8 +102,8 @@ class AvroSENoOldClassesTest extends AvroTestSpec {
   }
 
   "v2 to v3" should "decode with format" in {
-    val decoder = implicitly[Decoder[AvroCommand, MovieChangedV3]]
-    decoder.decode(AvroCommand(
+    val decoder = implicitly[Decoder[AvroSchemaEvolution, MovieChangedV3]]
+    decoder.decode(AvroSchemaEvolution(
       Base64("BmZvb4wfBmJhcg=="),
       oldSchema = """
         |{
@@ -135,8 +135,8 @@ class AvroSENoOldClassesTest extends AvroTestSpec {
   }
 
   "v1 to v3" should "decode with format" in {
-    val decoder = implicitly[Decoder[AvroCommand, MovieChangedV3]]
-    decoder.decode(AvroCommand(
+    val decoder = implicitly[Decoder[AvroSchemaEvolution, MovieChangedV3]]
+    decoder.decode(AvroSchemaEvolution(
       Base64("BmZvb4wf"),
       oldSchema =
         """
@@ -169,8 +169,8 @@ class AvroSENoOldClassesTest extends AvroTestSpec {
   }
 
   "v1 to v4" should "decode with format" in {
-    val decoder = implicitly[Decoder[AvroCommand, MovieChangedV4]]
-    decoder.decode(AvroCommand(
+    val decoder = implicitly[Decoder[AvroSchemaEvolution, MovieChangedV4]]
+    decoder.decode(AvroSchemaEvolution(
       Base64("BmZvb4wf"),
       oldSchema =
         """
@@ -203,8 +203,8 @@ class AvroSENoOldClassesTest extends AvroTestSpec {
   }
 
   "v1 to v5" should "decode with format" in {
-    val decoder = implicitly[Decoder[AvroCommand, MovieChangedV5]]
-    decoder.decode(AvroCommand(
+    val decoder = implicitly[Decoder[AvroSchemaEvolution, MovieChangedV5]]
+    decoder.decode(AvroSchemaEvolution(
       Base64("BmZvb4wf"),
       oldSchema =
         """
