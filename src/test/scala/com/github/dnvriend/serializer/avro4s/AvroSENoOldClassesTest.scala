@@ -70,170 +70,45 @@ class AvroSENoOldClassesTest extends AvroTestSpec {
   "v1 to v2" should "decode with format" in {
     val decoder = implicitly[Decoder[AvroSchemaEvolution, MovieChangedV2]]
     decoder.decode(AvroSchemaEvolution(
-      Base64("BmZvb4wf"),
-      oldSchema =
-        """
-        |{
-        |  "type" : "record",
-        |  "name" : "MovieChanged",
-        |  "version" : 1,
-        |  "namespace" : "foo.bar",
-        |  "fields" : [
-        |   { "name" : "title", "type" : "string" },
-        |   { "name" : "year", "type" : "int" }
-        |  ]
-        |}
-      """.stripMargin.toSchema,
-      newSchema =
-        """
-        |{
-        |  "type" : "record",
-        |  "name" : "MovieChanged",
-        |  "version" : 2,
-        |  "namespace" : "foo.bar",
-        |  "fields" : [
-        |   { "name" : "title", "type" : "string" },
-        |   { "name" : "year", "type" : "int" },
-        |   { "name" : "director", "type" : "string", "default" : "unknown" }
-        |  ]
-        |}
-      """.stripMargin.toSchema
+      Base64("BmZvb4wf"), //MovieChangedV1("foo", 1990)
+      oldSchema = SchemaRegistry.movieChanged(1),
+      newSchema = SchemaRegistry.movieChanged(2)
     )) shouldBe MovieChangedV2("foo", 1990, "unknown")
   }
 
   "v2 to v3" should "decode with format" in {
     val decoder = implicitly[Decoder[AvroSchemaEvolution, MovieChangedV3]]
     decoder.decode(AvroSchemaEvolution(
-      Base64("BmZvb4wfBmJhcg=="),
-      oldSchema = """
-        |{
-        |  "type" : "record",
-        |  "name" : "MovieChanged",
-        |  "version" : 2,
-        |  "namespace" : "foo.bar",
-        |  "fields" : [
-        |   { "name" : "title", "type" : "string" },
-        |   { "name" : "year", "type" : "int" },
-        |   { "name" : "director", "type" : "string" }
-        |  ]
-        |}
-      """.stripMargin.toSchema,
-      newSchema = """
-        |{
-        |  "type" : "record",
-        |  "name" : "MovieChanged",
-        |  "version" : 3,
-        |  "namespace" : "foo.bar",
-        |  "fields" : [
-        |   { "name" : "title", "type" : "string"},
-        |   { "name" : "released_year", "type" : "int", "aliases" : ["year"] },
-        |   { "name" : "director", "type" : "string"}
-        |  ]
-        |}
-      """.stripMargin.toSchema
+      Base64("BmZvb4wfBmJhcg=="), //MovieChangedV2("foo", 1990, "bar")
+      oldSchema = SchemaRegistry.movieChanged(2),
+      newSchema = SchemaRegistry.movieChanged(3)
     )) shouldBe MovieChangedV3("foo", 1990, "bar")
   }
 
   "v1 to v3" should "decode with format" in {
     val decoder = implicitly[Decoder[AvroSchemaEvolution, MovieChangedV3]]
     decoder.decode(AvroSchemaEvolution(
-      Base64("BmZvb4wf"),
-      oldSchema =
-        """
-        |{
-        |  "type" : "record",
-        |  "name" : "MovieChanged",
-        |  "version" : 1,
-        |  "namespace" : "foo.bar",
-        |  "fields" : [
-        |   { "name" : "title", "type" : "string" },
-        |   { "name" : "year", "type" : "int" }
-        |  ]
-        |}
-      """.stripMargin.toSchema,
-      newSchema =
-        """
-        |{
-        |  "type" : "record",
-        |  "name" : "MovieChanged",
-        |  "version" : 3,
-        |  "namespace" : "foo.bar",
-        |  "fields" : [
-        |   { "name" : "title", "type" : "string"},
-        |   { "name" : "released_year", "type" : "int", "aliases" : ["year"] },
-        |   { "name" : "director", "type" : "string", "default" : "unknown" }
-        |  ]
-        |}
-      """.stripMargin.toSchema
+      Base64("BmZvb4wf"), // MovieChangedV1("foo", 1990)
+      oldSchema = SchemaRegistry.movieChanged(1),
+      newSchema = SchemaRegistry.movieChanged(3)
     )) shouldBe MovieChangedV3("foo", 1990, "unknown")
   }
 
   "v1 to v4" should "decode with format" in {
     val decoder = implicitly[Decoder[AvroSchemaEvolution, MovieChangedV4]]
     decoder.decode(AvroSchemaEvolution(
-      Base64("BmZvb4wf"),
-      oldSchema =
-        """
-          |{
-          |  "type" : "record",
-          |  "name" : "MovieChanged",
-          |  "version" : 1,
-          |  "namespace" : "foo.bar",
-          |  "fields" : [
-          |   { "name" : "title", "type" : "string", "default" : "" },
-          |   { "name" : "year", "type" : "int", "default" : 0 }
-          |  ]
-          |}
-        """.stripMargin.toSchema,
-      newSchema =
-        """
-          |{
-          |  "type" : "record",
-          |  "name" : "MovieChanged",
-          |  "version" : 3,
-          |  "namespace" : "foo.bar",
-          |  "fields" : [
-          |   { "name" : "title", "type" : "string", "default" : "" },
-          |   { "name" : "director", "type" : "string", "default" : "" },
-          |   { "name" : "wonOscars", "type" : "int", "default" : 0 }
-          |  ]
-          |}
-        """.stripMargin.toSchema
-    )) shouldBe MovieChangedV4("foo", "", 0)
+      Base64("BmZvb4wf"), // MovieChangedV1("foo", 1990)
+      oldSchema = SchemaRegistry.movieChanged(1),
+      newSchema = SchemaRegistry.movieChanged(4)
+    )) shouldBe MovieChangedV4("foo", "unknown", 0)
   }
 
   "v1 to v5" should "decode with format" in {
     val decoder = implicitly[Decoder[AvroSchemaEvolution, MovieChangedV5]]
     decoder.decode(AvroSchemaEvolution(
-      Base64("BmZvb4wf"),
-      oldSchema =
-        """
-          |{
-          |  "type" : "record",
-          |  "name" : "MovieChanged",
-          |  "version" : 1,
-          |  "namespace" : "foo.bar",
-          |  "fields" : [
-          |   { "name" : "title", "type" : "string", "default" : "" },
-          |   { "name" : "year", "type" : "int", "default" : 0 }
-          |  ]
-          |}
-        """.stripMargin.toSchema,
-      newSchema =
-        """
-          |{
-          |  "type" : "record",
-          |  "name" : "MovieChanged",
-          |  "version" : 3,
-          |  "namespace" : "foo.bar",
-          |  "fields" : [
-          |   { "name" : "title", "type" : "string", "default" : "" },
-          |   { "name" : "director", "type" : "string", "default" : "unknown" },
-          |   { "name" : "wonOscars", "type" : "int", "default" : 0 },
-          |   { "name" : "releases", "type" : { "type": "map", "values" : "int" }, "default" : {  } }
-          |  ]
-          |}
-        """.stripMargin.toSchema
+      Base64("BmZvb4wf"), //MovieChangedV1("foo", 1990)
+      oldSchema = SchemaRegistry.movieChanged(1),
+      newSchema = SchemaRegistry.movieChanged(5)
     )) shouldBe MovieChangedV5("foo", "unknown", 0, Map.empty)
   }
 }
