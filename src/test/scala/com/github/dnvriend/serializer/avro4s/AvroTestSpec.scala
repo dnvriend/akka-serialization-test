@@ -121,6 +121,7 @@ class AvroTestSpec extends TestSpec {
 
   implicit class ArrayOps(xs: Array[Byte]) {
     def encode[OUT](implicit ev: Encoder[Array[Byte], OUT]): OUT = ev.encode(xs)
+    def toHex: String = xs.map(byte ⇒ f"$byte%02x").mkString("")
   }
 
   implicit class Base64Ops(base64: Base64) {

@@ -105,6 +105,9 @@ Hence, this is a _macro based_ library and generates code for use with Avro at c
 _not yet available_
 
 # What's new?
+## 1.0.3 (2016-06-19)
+  - Merged PE #5 [Giampaolo Trapasso][trapasso] Avro schema evolution 2, thanks!
+
 ## 1.0.2 (2016-06-16)
   - Merged PE #4 [Giampaolo Trapasso][trapasso] Avro schema evolution, thanks!
 

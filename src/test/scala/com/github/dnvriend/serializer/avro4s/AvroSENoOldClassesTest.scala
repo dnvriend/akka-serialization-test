@@ -36,6 +36,8 @@ class AvroSENoOldClassesTest extends AvroTestSpec {
     val encoder = implicitly[Encoder[MovieChangedV1, Base64]]
     val base64 = encoder.encode(event)
     base64.value shouldBe "BmZvb4wf"
+    val version = base64.decode[Array[Byte]].slice(1, 5).toHex
+    version shouldBe "666f6f8c"
   }
 
   it should "decode from base64" in {
@@ -48,6 +50,8 @@ class AvroSENoOldClassesTest extends AvroTestSpec {
     val encoder = implicitly[Encoder[MovieChangedV2, Base64]]
     val base64 = encoder.encode(event)
     base64.value shouldBe "BmZvb4wfBmJhcg=="
+    val version = base64.decode[Array[Byte]].slice(1, 5).toHex
+    version shouldBe "666f6f8c"
   }
 
   it should "decode from base64" in {
@@ -60,6 +64,8 @@ class AvroSENoOldClassesTest extends AvroTestSpec {
     val encoder = implicitly[Encoder[MovieChangedV3, Base64]]
     val base64 = encoder.encode(event)
     base64.value shouldBe "BmZvb4wfBmJhcg=="
+    val version = base64.decode[Array[Byte]].slice(1, 5).toHex
+    version shouldBe "666f6f8c"
   }
 
   it should "decode from base64" in {
