@@ -86,8 +86,8 @@ object Decoder {
     }
   }
 
-  implicit def AvroSchemaDecoder[A <: Event: ToRecord: FromRecord: RecordFormat] = new Decoder[AvroCommand, A] {
-    override def decode(in: AvroCommand): A = {
+  implicit def AvroSchemaDecoder[A <: Event: ToRecord: FromRecord: RecordFormat] = new Decoder[AvroSchemaEvolution, A] {
+    override def decode(in: AvroSchemaEvolution): A = {
       val gdr = new GenericDatumReader[GenericRecord](in.oldSchema, in.newSchema) // (writer, reader)
       val seek = new SeekableByteArrayInput(implicitly[Decoder[Base64, Array[Byte]]].decode(in.base64))
       val binDecoder = DecoderFactory.get().binaryDecoder(seek, null)
@@ -105,7 +105,7 @@ trait Decoder[IN, OUT] {
 }
 
 case class Base64(value: String)
-case class AvroCommand(base64: Base64, oldSchema: Schema, newSchema: Schema)
+case class AvroSchemaEvolution(base64: Base64, oldSchema: Schema, newSchema: Schema)
 
 trait Event
 final case class MovieChangedV1(title: String, year: Int) extends Event
@@ -126,4 +126,84 @@ class AvroTestSpec extends TestSpec {
   implicit class Base64Ops(base64: Base64) {
     def decode[OUT](implicit ev: Decoder[Base64, OUT]): OUT = ev.decode(base64)
   }
+
+  object SchemaRegistry {
+
+    val movieChanged: Map[Int, Schema] = Map(
+      1 →
+        """
+          |{
+          |  "type" : "record",
+          |  "name" : "MovieChanged",
+          |  "version" : 1,
+          |  "namespace" : "foo.bar",
+          |  "fields" : [
+          |   { "name" : "title", "type" : "string" },
+          |   { "name" : "year", "type" : "int" }
+          |  ]
+          |}
+        """
+        .stripMargin.toSchema,
+      2 →
+        """
+          |{
+          |  "type" : "record",
+          |  "name" : "MovieChanged",
+          |  "version" : 2,
+          |  "namespace" : "foo.bar",
+          |  "fields" : [
+          |   { "name" : "title", "type" : "string" },
+          |   { "name" : "year", "type" : "int" },
+          |   { "name" : "director", "type" : "string", "default": "unknown" }
+          |  ]
+          |}
+        """
+        .stripMargin.toSchema,
+      3 →
+        """
+          |{
+          |  "type" : "record",
+          |  "name" : "MovieChanged",
+          |  "version" : 3,
+          |  "namespace" : "foo.bar",
+          |  "fields" : [
+          |   { "name" : "title", "type" : "string"},
+          |   { "name" : "released_year", "type" : "int", "aliases" : ["year"] },
+          |   { "name" : "director", "type" : "string", "default" : "unknown" }
+          |  ]
+          |}
+        """.stripMargin.toSchema,
+      4 →
+        """
+          |{
+          |  "type" : "record",
+          |  "name" : "MovieChanged",
+          |  "version" : 3,
+          |  "namespace" : "foo.bar",
+          |  "fields" : [
+          |   { "name" : "title", "type" : "string", "default" : "" },
+          |   { "name" : "director", "type" : "string", "default" : "unknown" },
+          |   { "name" : "wonOscars", "type" : "int", "default" : 0 }
+          |  ]
+          |}
+        """.stripMargin.toSchema,
+      5 →
+        """
+          |{
+          |  "type" : "record",
+          |  "name" : "MovieChanged",
+          |  "version" : 5,
+          |  "namespace" : "foo.bar",
+          |  "fields" : [
+          |   { "name" : "title", "type" : "string", "default" : "" },
+          |   { "name" : "director", "type" : "string", "default" : "unknown" },
+          |   { "name" : "wonOscars", "type" : "int", "default" : 0 },
+          |   { "name" : "releases", "type" : { "type": "map", "values" : "int" }, "default" : {  } }
+          |  ]
+          |}
+        """.stripMargin.toSchema
+    )
+  }
+
 }
+
