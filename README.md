@@ -1,5 +1,6 @@
 # akka-serialization-test #
 
+[![Build Status](https://travis-ci.org/dnvriend/akka-serialization-test.svg?branch=master)](https://travis-ci.org/dnvriend/akka-serialization-test)
 [![Join the chat at https://gitter.im/dnvriend/akka-serialization-test](https://badges.gitter.im/dnvriend/akka-serialization-test.svg)](https://gitter.im/dnvriend/akka-serialization-test?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![License](http://img.shields.io/:license-Apache%202-red.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
