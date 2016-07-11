@@ -88,13 +88,25 @@ class Album(val persistenceId: String) extends PersistentActor with ActorLogging
 
   override def receiveCommand: Receive = LoggingReceive {
     case ChangeAlbumTitle(newTitle) ⇒
-      persistAll(List(TitleChanged(newTitle)))(handleEvent)
+      persistAll(List(TitleChanged(newTitle))) { e ⇒
+        handleEvent(e)
+        sender() ! akka.actor.Status.Success("")
+      }
     case ChangeAlbumYear(newYear) ⇒
-      persistAll(List(YearChanged(newYear)))(handleEvent)
+      persistAll(List(YearChanged(newYear))) { e ⇒
+        handleEvent(e)
+        sender() ! akka.actor.Status.Success("")
+      }
     case AddSong(newSong) ⇒
-      persistAll(List(SongAdded(newSong)))(handleEvent)
+      persistAll(List(SongAdded(newSong))) { e ⇒
+        handleEvent(e)
+        sender() ! akka.actor.Status.Success("")
+      }
     case RemoveSong(oldSong) ⇒
-      persistAll(List(SongRemoved(oldSong)))(handleEvent)
+      persistAll(List(SongRemoved(oldSong))) { e ⇒
+        handleEvent(e)
+        sender() ! akka.actor.Status.Success("")
+      }
   }
 
   override def postStop(): Unit = {

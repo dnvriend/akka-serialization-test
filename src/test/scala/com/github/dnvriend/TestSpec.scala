@@ -21,15 +21,27 @@ import akka.event.{ Logging, LoggingAdapter }
 import akka.serialization.SerializationExtension
 import akka.stream.{ ActorMaterializer, Materializer }
 import akka.testkit.TestProbe
+import akka.util.Timeout
 import org.scalatest.concurrent.{ Eventually, ScalaFutures }
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, GivenWhenThen, Matchers }
 
+import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
-import scala.concurrent.duration._
 
-trait TestSpec extends FlatSpec with Matchers with GivenWhenThen with ScalaFutures with BeforeAndAfterAll with Eventually with PropertyChecks {
+trait TestSpec extends FlatSpec
+    with Matchers
+    with GivenWhenThen
+    with ScalaFutures
+    with BeforeAndAfterAll
+    with Eventually
+    with PropertyChecks
+    with AkkaPersistenceQueries
+    with AkkaStreamUtils
+    with InMemoryCleanup {
+
+  implicit val timeout: Timeout = Timeout(10.seconds)
   implicit val system: ActorSystem = ActorSystem()
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val mat: Materializer = ActorMaterializer()
@@ -41,10 +53,7 @@ trait TestSpec extends FlatSpec with Matchers with GivenWhenThen with ScalaFutur
     def toTry: Try[T] = Try(f.futureValue)
   }
 
-  /**
-   * Sends the PoisonPill command to an actor and waits for it to die
-   */
-  def cleanup(actors: ActorRef*): Unit = {
+  def killActors(actors: ActorRef*): Unit = {
     val probe = TestProbe()
     actors.foreach { actor ⇒
       probe watch actor

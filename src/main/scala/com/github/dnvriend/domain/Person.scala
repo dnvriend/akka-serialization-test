@@ -61,11 +61,20 @@ class Person(val persistenceId: String) extends PersistentActor with ActorLoggin
 
   override def receiveCommand: Receive = LoggingReceive {
     case RegisterName(name, surname) ⇒
-      persist(NameRegistered(name, surname))(handleEvent)
+      persist(NameRegistered(name, surname)) { e ⇒
+        handleEvent(e)
+        sender() ! akka.actor.Status.Success("")
+      }
     case ChangeName(newName) ⇒
-      persist(NameChanged(newName))(handleEvent)
+      persist(NameChanged(newName)) { e ⇒
+        handleEvent(e)
+        sender() ! akka.actor.Status.Success("")
+      }
     case ChangeSurname(newSurname) ⇒
-      persist(SurnameChanged(newSurname))(handleEvent)
+      persist(SurnameChanged(newSurname)) { e ⇒
+        handleEvent(e)
+        sender() ! akka.actor.Status.Success("")
+      }
   }
 
   override def postStop(): Unit = {

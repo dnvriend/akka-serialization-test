@@ -1,19 +1,18 @@
-# akka-serialization-test
+# akka-serialization-test #
+
+[![Join the chat at https://gitter.im/dnvriend/akka-serialization-test](https://badges.gitter.im/dnvriend/akka-serialization-test.svg)](https://gitter.im/dnvriend/akka-serialization-test?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License](http://img.shields.io/:license-Apache%202-red.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
 Study on [akka-serialization][ser] using [Google Protocol Buffers][pb], [Kryo][kryo] and [Avro][avro]
 
-Service | Status | Description
-------- | ------ | -----------
-License | [![License](http://img.shields.io/:license-Apache%202-red.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) | Apache 2.0
-Gitter  | [![Join the chat at https://gitter.im/dnvriend/akka-serialization-test](https://badges.gitter.im/dnvriend/akka-serialization-test.svg)](https://gitter.im/dnvriend/akka-serialization-test?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) | Chat on Gitter
-
-# TL;DR
+## TL;DR ##
 Define domain command and events messages in the companion object of the `PersistentActor` using DDD concepts.
 Configure the serialization library you wish to use, looking at the examples. Register the serializer to use 
 in `application.conf` in the path `akka.actor.serializers` and register the classes to bind to a certain serializer in the path 
 `akka.actor.serialization-bindings`. When the serializer and bindings have been configured, Akka serialization will transparently 
 serialize/deserialize messages.
 
-# Overview
+## Overview ##
 [Akka serialization][ser] is a good way for domain messages
 like commands and events to be serialized to a format of choice. In this example, the domain messages are defined
 in the companion object of the `Person` which is an `PersistentActor`. The actor handles commands like `RegisterName`,
@@ -77,6 +76,12 @@ The example project shows the following:
 * How to test the Person domain object
 * How to test the custom serializers.
 
+## Google Protocol Buffers ##
+
+
+## ScalaPB ##
+
+
 # Kryo, Twitter Chill and Akka
 [Kryo][kryo] is a fast and efficient object graph serialization framework for Java. The goals of the project are speed, 
 efficiency, and an easy to use API. The project is useful any time objects need to be persisted, whether to a file, database, 
@@ -127,6 +132,9 @@ Have fun!
 [storm]: http://storm.apache.org/
 [ser]: http://doc.akka.io/docs/akka/current/scala/serialization.html
 [pb]: https://developers.google.com/protocol-buffers/docs/overview
+[scalapb-github]: https://github.com/trueaccord/ScalaPB
+[scalapb]: http://trueaccord.github.io/ScalaPB/
+[scalapb-sbt]: http://trueaccord.github.io/ScalaPB/sbt-settings.html
 [kryo]: https://github.com/EsotericSoftware/kryo
 [scala]: http://www.scala-lang.org/
 [chill]: https://github.com/twitter/chill
@@ -137,3 +145,5 @@ Have fun!
 [avro4s]: https://github.com/sksamuel/avro4s
 [elastic4s]: https://github.com/sksamuel/elastic4s
 [thrift-wiki]: https://en.wikipedia.org/wiki/Apache_Thrift
+
+[nadav-samet-working-protobuf]: https://www.youtube.com/watch?v=cQdMyjHjbn8

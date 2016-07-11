@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.repository
+package com.github.dnvriend
 
-import akka.actor.{ Props, ActorRef, ActorSystem }
-import com.github.dnvriend.domain.Album
+import akka.persistence.inmemory.extension.{ InMemoryJournalStorage, StorageExtension }
+import akka.testkit.TestProbe
+import org.scalatest.BeforeAndAfterEach
 
-object AlbumRepository {
-  def forId(id: String)(implicit system: ActorSystem): ActorRef =
-    system.actorOf(Props(new Album(id)), id)
+trait InMemoryCleanup extends BeforeAndAfterEach { _: TestSpec ⇒
+
+  lazy val storage = StorageExtension(system).journalStorage
+
+  override protected def beforeEach(): Unit = {
+    val tp = TestProbe()
+    tp.send(storage, InMemoryJournalStorage.ClearJournal)
+    tp.expectMsg(akka.actor.Status.Success(""))
+    super.beforeEach()
+  }
 }

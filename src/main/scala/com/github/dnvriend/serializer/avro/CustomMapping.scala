@@ -25,7 +25,7 @@ import org.apache.avro.Schema.Field
 object CustomMapping {
 
   implicit object DurationToSchema extends ToSchema[Duration] {
-    override def apply(): Schema = Schema.create(Schema.Type.STRING)
+    override protected val schema: Schema = Schema.create(Schema.Type.STRING)
   }
 
   implicit object DurationToValue extends ToValue[Duration] {

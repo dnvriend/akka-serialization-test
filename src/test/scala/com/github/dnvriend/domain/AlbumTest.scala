@@ -18,33 +18,25 @@ package com.github.dnvriend.domain
 
 import java.time.Duration
 
-import akka.persistence.inmemory.query.journal.scaladsl.InMemoryReadJournal
-import akka.persistence.query.PersistenceQuery
-import akka.stream.testkit.scaladsl.TestSink
+import akka.pattern.ask
+import akka.stream.scaladsl.{ Sink, Source }
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.domain.Music._
 import com.github.dnvriend.repository.AlbumRepository
 
 class AlbumTest extends TestSpec {
-  lazy val queries = PersistenceQuery(system).readJournalFor[InMemoryReadJournal](InMemoryReadJournal.Identifier)
-
-  def eventsForPersistenceIdSource(id: String) =
-    queries.currentEventsByPersistenceId(id, 0L, Long.MaxValue).map(_.event)
 
   "Album" should "register a title" in {
     val album = AlbumRepository.forId("album-1")
     val xs = List(ChangeAlbumTitle("Dark side of the Moon"))
-    xs foreach (album ! _)
+    Source(xs).mapAsync(1)(album ? _).runWith(Sink.ignore).futureValue
 
-    eventually {
-      eventsForPersistenceIdSource("album-1")
-        .runWith(TestSink.probe[Any])
-        .request(Int.MaxValue)
-        .expectNextN(xs.map(cmd ⇒ TitleChanged(cmd.title)))
-        .expectComplete()
+    eventsForPersistenceIdSource("album-1").testProbe { tp ⇒
+      tp.request(Int.MaxValue)
+      tp.expectNextN(xs.map(cmd ⇒ TitleChanged(cmd.title)))
+      tp.expectComplete()
     }
-
-    cleanup(album)
+    killActors(album)
   }
 
   it should "update its title and year and songs" in {
@@ -64,15 +56,12 @@ class AlbumTest extends TestSpec {
       case RemoveSong(song)        ⇒ SongRemoved(song)
     }
 
-    xs foreach (album ! _)
-    eventually {
-      eventsForPersistenceIdSource("album-2")
-        .runWith(TestSink.probe[Any])
-        .request(Int.MaxValue)
-        .expectNextN(
-          expectedEvents
-        )
-        .expectComplete()
+    Source(xs).mapAsync(1)(album ? _).runWith(Sink.ignore).futureValue
+
+    eventsForPersistenceIdSource("album-2").testProbe { tp ⇒
+      tp.request(Int.MaxValue)
+      tp.expectNextN(expectedEvents)
+      tp.expectComplete()
     }
   }
 }
