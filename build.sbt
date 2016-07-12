@@ -15,11 +15,11 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
     "com.typesafe.akka" %% "akka-persistence" % akkaVersion,
     "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-    "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+    "com.typesafe.akka" %% "akka-remote" % akkaVersion,
+    "ch.qos.logback" % "logback-classic" % "1.1.7" % Test,
     "com.twitter" %% "chill-akka" % "0.8.0",
     "com.sksamuel.avro4s" %% "avro4s-core" % "1.5.1",
     "org.apache.avro" % "avro" % "1.8.1",
-    "ch.qos.logback" % "logback-classic" % "1.1.7",
     "org.json4s" %% "json4s-native" % "3.4.0",
     "com.trueaccord.scalapb" %% "scalapb-json4s" % "0.1.1",
     "org.scalaz" %% "scalaz-core" % "7.2.4",
@@ -66,6 +66,8 @@ enablePlugins(AutomateHeaderPlugin)
 import com.trueaccord.scalapb.{ScalaPbPlugin => PB}
 
 PB.protobufSettings
+
+PB.javaConversions in PB.protobufConfig := true
 
 // protoc-jar which is on the sbt classpath //
 // see: https://github.com/os72/protoc-jar

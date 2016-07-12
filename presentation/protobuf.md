@@ -55,6 +55,18 @@ file or transported on a network
 
 ### What are protocol buffers
 
+- flexible, efficient, automated mechanism for serializing structured data
+- define how you want your data to be structured once
+- Use protoc compiler to generate binding classes to serialize from/to binary format
+- Akka has built in support for protobuf with out-of-the-box serializer and config
+- detach the domain model from the data model
+- 1. event adapter to convert from/to scala domain / protobuf data domain
+
+
+---
+
+### What are protocol buffers
+
 - Language that describes data structures
 - Defines encoding as bytes
 - Compiler generates code for Java, C++, Python,

@@ -16,41 +16,68 @@
 
 package com.github.dnvriend.domain
 
+import akka.actor.{ ActorRef, Props }
 import akka.pattern.ask
+import akka.persistence.query.EventEnvelope
 import akka.stream.scaladsl.{ Sink, Source }
+import akka.testkit.TestProbe
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.domain.Person._
-import com.github.dnvriend.generator.PersonCommandGenerator
-import com.github.dnvriend.repository.PersonRepository
+import com.github.dnvriend.persistence.ProtobufDeserializer
+import proto.Datamodel.{ NameChanged, NameRegistered, SurnameChanged }
 
 class PersonTest extends TestSpec {
 
-  "Person" should "register a name" in {
-    val person = PersonRepository.forId("person-1")
-    val xs = PersonCommandGenerator.registerNameCommands
-    Source(xs).mapAsync(1)(person ? _).runWith(Sink.ignore).futureValue
+  import com.github.dnvriend.persistence.PersonEventProtobufEventAdapter._
 
-    eventsForPersistenceIdSource("person-1").testProbe { tp ⇒
-      tp.request(Int.MaxValue)
-      tp.expectNextN(xs.map(cmd ⇒ NameRegistered(cmd.name, cmd.surname)))
-      tp.expectComplete()
+  def withPerson(id: String)(f: ActorRef ⇒ TestProbe ⇒ Unit): Unit = {
+    val tp = TestProbe()
+    val ref = system.actorOf(Props(new Person(id)))
+    try f(ref)(tp) finally killActors(ref)
+  }
+
+  "Person" should "register a name" in {
+    withPerson("p1") { ref ⇒ tp ⇒
+      Source(List(RegisterName("dennis", "vriend")))
+        .mapAsync(1)(ref ? _).runWith(Sink.ignore).futureValue
     }
 
-    killActors(person)
+    withPerson("p1") { ref ⇒ tp ⇒
+      Source(List(RegisterName("dennis", "vriend")))
+        .mapAsync(1)(ref ? _).runWith(Sink.ignore).futureValue
+    }
+
+    // note that the persistence-query does not use the deserializer
+    // so the protobuf must be deserialized inline
+    eventsForPersistenceIdSource("p1").collect {
+      case EventEnvelope(_, _, _, proto: NameRegistered) ⇒
+        implicitly[ProtobufDeserializer[NameRegisteredPersonEvent]].deserialize(proto)
+    }.testProbe { tp ⇒
+      tp.request(Int.MaxValue)
+      tp.expectNext(NameRegisteredPersonEvent("dennis", "vriend"))
+      tp.expectNext(NameRegisteredPersonEvent("dennis", "vriend"))
+      tp.expectComplete()
+    }
   }
 
   it should "update its name and surname" in {
-    val person = PersonRepository.forId("person-2")
-    val xs = PersonCommandGenerator.personCommands
-    Source(xs).mapAsync(1)(person ? _).runWith(Sink.ignore).futureValue
+    withPerson("p2") { ref ⇒ tp ⇒
+      Source(List(RegisterName("dennis", "vriend"), ChangeName("jimi"), ChangeSurname("hendrix")))
+        .mapAsync(1)(ref ? _).runWith(Sink.ignore).futureValue
+    }
 
-    eventsForPersistenceIdSource("person-2").testProbe { tp ⇒
+    eventsForPersistenceIdSource("p2").collect {
+      case EventEnvelope(_, _, _, proto: NameRegistered) ⇒
+        implicitly[ProtobufDeserializer[NameRegisteredPersonEvent]].deserialize(proto)
+      case EventEnvelope(_, _, _, proto: NameChanged) ⇒
+        implicitly[ProtobufDeserializer[NameChangedPersonEvent]].deserialize(proto)
+      case EventEnvelope(_, _, _, proto: SurnameChanged) ⇒
+        implicitly[ProtobufDeserializer[SurnameChangedPersonEvent]].deserialize(proto)
+    }.testProbe { tp ⇒
       tp.request(Int.MaxValue)
-      tp.expectNextN(xs.map {
-        case RegisterName(name, surname) ⇒ NameRegistered(name, surname)
-        case ChangeName(name)            ⇒ NameChanged(name)
-        case ChangeSurname(surname)      ⇒ SurnameChanged(surname)
-      })
+      tp.expectNext(NameRegisteredPersonEvent("dennis", "vriend"))
+      tp.expectNext(NameChangedPersonEvent("jimi"))
+      tp.expectNext(SurnameChangedPersonEvent("hendrix"))
       tp.expectComplete()
     }
   }

@@ -18,13 +18,13 @@ package com.github.dnvriend
 
 import akka.NotUsed
 import akka.persistence.inmemory.query.scaladsl.InMemoryReadJournal
-import akka.persistence.query.PersistenceQuery
+import akka.persistence.query.{ EventEnvelope, PersistenceQuery }
 import akka.persistence.query.scaladsl.{ CurrentEventsByPersistenceIdQuery, ReadJournal }
 import akka.stream.scaladsl.Source
 
 trait AkkaPersistenceQueries { _: TestSpec ⇒
   lazy val queries = PersistenceQuery(system).readJournalFor[ReadJournal with CurrentEventsByPersistenceIdQuery](InMemoryReadJournal.Identifier)
 
-  def eventsForPersistenceIdSource(id: String): Source[Any, NotUsed] =
-    queries.currentEventsByPersistenceId(id, 0L, Long.MaxValue).map(_.event)
+  def eventsForPersistenceIdSource(id: String): Source[EventEnvelope, NotUsed] =
+    queries.currentEventsByPersistenceId(id, 0L, Long.MaxValue)
 }

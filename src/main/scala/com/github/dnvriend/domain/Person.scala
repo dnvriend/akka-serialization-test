@@ -18,13 +18,13 @@ package com.github.dnvriend.domain
 
 import akka.actor.ActorLogging
 import akka.event.LoggingReceive
-import akka.persistence.PersistentActor
+import akka.persistence.{ PersistentActor, RecoveryCompleted }
 
 object Person {
   sealed trait PersonEvent
-  final case class NameRegistered(name: String, surname: String) extends PersonEvent
-  final case class NameChanged(name: String) extends PersonEvent
-  final case class SurnameChanged(surname: String) extends PersonEvent
+  final case class NameRegisteredPersonEvent(name: String, surname: String) extends PersonEvent
+  final case class NameChangedPersonEvent(name: String) extends PersonEvent
+  final case class SurnameChangedPersonEvent(surname: String) extends PersonEvent
 
   sealed trait PersonCommand
   final case class RegisterName(name: String, surname: String) extends PersonCommand
@@ -38,40 +38,44 @@ class Person(val persistenceId: String) extends PersistentActor with ActorLoggin
   var surname: String = _
 
   override def receiveRecover: Receive = LoggingReceive {
-    case e: NameRegistered ⇒ handleEvent(e)
-    case e: NameChanged    ⇒ handleEvent(e)
-    case e: SurnameChanged ⇒ handleEvent(e)
+    case e: NameRegisteredPersonEvent ⇒
+
+      handleEvent(e)
+    case e: NameChangedPersonEvent    ⇒ handleEvent(e)
+    case e: SurnameChangedPersonEvent ⇒ handleEvent(e)
+    case RecoveryCompleted            ⇒ println("==> Recovery completed")
+    case e                            ⇒ println("Dropping event: " + e.getClass.getName)
   }
 
-  def handleEvent(event: NameRegistered): Unit = {
+  def handleEvent(event: NameRegisteredPersonEvent): Unit = {
     this.name = event.name
     this.surname = event.surname
     log.debug(s"[NameRegistered]: Person $persistenceId => name: $name, surname: $surname")
   }
 
-  def handleEvent(event: NameChanged): Unit = {
+  def handleEvent(event: NameChangedPersonEvent): Unit = {
     this.name = event.name
     log.debug(s"[NameChanged]: Person $persistenceId => name: $name, surname: $surname")
   }
 
-  def handleEvent(event: SurnameChanged): Unit = {
+  def handleEvent(event: SurnameChangedPersonEvent): Unit = {
     this.surname = event.surname
     log.debug(s"[SurnameChanged]: Person $persistenceId => name: $name, surname: $surname")
   }
 
   override def receiveCommand: Receive = LoggingReceive {
     case RegisterName(name, surname) ⇒
-      persist(NameRegistered(name, surname)) { e ⇒
+      persist(NameRegisteredPersonEvent(name, surname)) { e ⇒
         handleEvent(e)
         sender() ! akka.actor.Status.Success("")
       }
     case ChangeName(newName) ⇒
-      persist(NameChanged(newName)) { e ⇒
+      persist(NameChangedPersonEvent(newName)) { e ⇒
         handleEvent(e)
         sender() ! akka.actor.Status.Success("")
       }
     case ChangeSurname(newSurname) ⇒
-      persist(SurnameChanged(newSurname)) { e ⇒
+      persist(SurnameChangedPersonEvent(newSurname)) { e ⇒
         handleEvent(e)
         sender() ! akka.actor.Status.Success("")
       }

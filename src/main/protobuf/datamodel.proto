@@ -1,0 +1,15 @@
+syntax = "proto2";
+option java_package = "proto";
+
+message NameRegistered {
+    optional string name = 1;
+    optional string surname = 2;
+}
+
+message NameChanged {
+    optional string name = 1;
+}
+
+message SurnameChanged {
+    optional string surname = 1;
+}
