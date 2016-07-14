@@ -1,15 +1,15 @@
 syntax = "proto2";
-option java_package = "proto";
+option java_package = "proto.person";
 
-message NameRegistered {
+message NameRegisteredMessage {
     optional string name = 1;
     optional string surname = 2;
 }
 
-message NameChanged {
+message NameChangedMessage {
     optional string name = 1;
 }
 
-message SurnameChanged {
+message SurnameChangedMessage {
     optional string surname = 1;
 }

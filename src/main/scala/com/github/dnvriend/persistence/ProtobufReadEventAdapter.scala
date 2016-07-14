@@ -17,20 +17,19 @@
 package com.github.dnvriend.persistence
 
 import akka.persistence.journal.{ EventSeq, ReadEventAdapter }
-import com.github.dnvriend.domain.Person.{ NameChangedPersonEvent, NameRegisteredPersonEvent, SurnameChangedPersonEvent }
+import com.github.dnvriend.domain.Person.{ NameChangedEvent, NameRegisteredEvent, SurnameChangedEvent }
 import com.google.protobuf.Message
 
 class ProtobufReadEventAdapter extends ReadEventAdapter {
-
   import ProtobufFormats._
 
   protected def deserialize[A: ProtobufReader](proto: Message): EventSeq =
     EventSeq.single(implicitly[ProtobufReader[A]].read(proto))
 
   override def fromJournal(event: Any, manifest: String): EventSeq = event match {
-    case proto: Message if manifest == "NameRegisteredPersonEvent" ⇒ deserialize[NameRegisteredPersonEvent](proto)
-    case proto: Message if manifest == "NameChangedPersonEvent"    ⇒ deserialize[NameChangedPersonEvent](proto)
-    case proto: Message if manifest == "SurnameChangedPersonEvent" ⇒ deserialize[SurnameChangedPersonEvent](proto)
-    case _                                                         ⇒ throw new RuntimeException(s"[${this.getClass.getName}]Cannot deserialize '${event.getClass.getName}' with manifest: '$manifest' from protobuf ")
+    case proto: Message if manifest == classOf[NameRegisteredEvent].getSimpleName ⇒ deserialize[NameRegisteredEvent](proto)
+    case proto: Message if manifest == classOf[NameChangedEvent].getSimpleName    ⇒ deserialize[NameChangedEvent](proto)
+    case proto: Message if manifest == classOf[SurnameChangedEvent].getSimpleName ⇒ deserialize[SurnameChangedEvent](proto)
+    case _                                                                        ⇒ throw new RuntimeException(s"[${this.getClass.getName}]Cannot deserialize '${event.getClass.getName}' with manifest: '$manifest' from protobuf ")
   }
 }

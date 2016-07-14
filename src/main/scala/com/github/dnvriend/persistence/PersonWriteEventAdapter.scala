@@ -16,7 +16,7 @@
 
 package com.github.dnvriend.persistence
 
-import com.github.dnvriend.domain.Person.{ NameChangedPersonEvent, NameRegisteredPersonEvent, SurnameChangedPersonEvent }
+import com.github.dnvriend.domain.Person.{ NameChangedEvent, NameRegisteredEvent, SurnameChangedEvent }
 
 class PersonWriteEventAdapter extends ProtobufWriteEventAdapter {
   import ProtobufFormats._
@@ -25,9 +25,9 @@ class PersonWriteEventAdapter extends ProtobufWriteEventAdapter {
     event.getClass.getSimpleName
 
   override def toJournal(event: Any): Any = event match {
-    case event: NameRegisteredPersonEvent ⇒ serializeTagged(event)
-    case event: NameChangedPersonEvent    ⇒ serializeTagged(event)
-    case event: SurnameChangedPersonEvent ⇒ serializeTagged(event)
-    case _                                ⇒ throw new RuntimeException(s"Cannot serialize '${event.getClass.getName}' to protobuf")
+    case event: NameRegisteredEvent ⇒ serializeTagged(event)
+    case event: NameChangedEvent    ⇒ serializeTagged(event)
+    case event: SurnameChangedEvent ⇒ serializeTagged(event)
+    case _                          ⇒ throw new RuntimeException(s"Cannot serialize '${event.getClass.getName}' to protobuf")
   }
 }

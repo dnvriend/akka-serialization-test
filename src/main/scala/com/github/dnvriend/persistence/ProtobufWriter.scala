@@ -16,9 +16,9 @@
 
 package com.github.dnvriend.persistence
 
-import com.github.dnvriend.domain.Person.{ NameChangedPersonEvent, NameRegisteredPersonEvent, SurnameChangedPersonEvent }
+import com.github.dnvriend.domain.Person.{ NameChangedEvent, NameRegisteredEvent, SurnameChangedEvent }
 import com.google.protobuf.Message
-import proto.Datamodel.{ NameChanged, NameRegistered, SurnameChanged }
+import proto.person.Command._
 
 trait ProtobufWriter[A] {
   def write(event: A): Message
@@ -31,40 +31,40 @@ trait ProtobufReader[A] {
 trait ProtobufFormat[A] extends ProtobufWriter[A] with ProtobufReader[A]
 
 object ProtobufFormats {
-  implicit val surnameChangedProtobufProtocol = new ProtobufFormat[SurnameChangedPersonEvent] {
-    override def write(event: SurnameChangedPersonEvent): Message = {
-      val builder = SurnameChanged.newBuilder
+  implicit val surnameChangedProtobufProtocol = new ProtobufFormat[SurnameChangedEvent] {
+    override def write(event: SurnameChangedEvent): Message = {
+      val builder = SurnameChangedMessage.newBuilder
       builder.setSurname(event.surname)
       builder.build()
     }
 
-    override def read(proto: Message): SurnameChangedPersonEvent = proto match {
-      case p: SurnameChanged ⇒ SurnameChangedPersonEvent(p.getSurname)
+    override def read(proto: Message): SurnameChangedEvent = proto match {
+      case p: SurnameChangedMessage ⇒ SurnameChangedEvent(p.getSurname)
     }
   }
 
-  implicit val nameChangedProtobufProtocol = new ProtobufFormat[NameChangedPersonEvent] {
-    override def write(event: NameChangedPersonEvent): Message = {
-      val builder = NameChanged.newBuilder()
+  implicit val nameChangedProtobufProtocol = new ProtobufFormat[NameChangedEvent] {
+    override def write(event: NameChangedEvent): Message = {
+      val builder = NameChangedMessage.newBuilder()
       builder.setName(event.name)
       builder.build()
     }
 
-    override def read(proto: Message): NameChangedPersonEvent = proto match {
-      case p: NameChanged ⇒ NameChangedPersonEvent(p.getName)
+    override def read(proto: Message): NameChangedEvent = proto match {
+      case p: NameChangedMessage ⇒ NameChangedEvent(p.getName)
     }
   }
 
-  implicit val nameRegisteredProtobufProtocol = new ProtobufFormat[NameRegisteredPersonEvent] {
-    override def write(event: NameRegisteredPersonEvent): Message = {
-      val builder = NameRegistered.newBuilder()
+  implicit val nameRegisteredProtobufProtocol = new ProtobufFormat[NameRegisteredEvent] {
+    override def write(event: NameRegisteredEvent): Message = {
+      val builder = NameRegisteredMessage.newBuilder()
       builder.setName(event.name)
       builder.setSurname(event.surname)
       builder.build()
     }
 
-    override def read(proto: Message): NameRegisteredPersonEvent = proto match {
-      case p: NameRegistered ⇒ NameRegisteredPersonEvent(p.getName, p.getSurname)
+    override def read(proto: Message): NameRegisteredEvent = proto match {
+      case p: NameRegisteredMessage ⇒ NameRegisteredEvent(p.getName, p.getSurname)
     }
   }
 }

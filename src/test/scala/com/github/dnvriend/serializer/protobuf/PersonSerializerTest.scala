@@ -17,16 +17,19 @@
 package com.github.dnvriend.serializer.protobuf
 
 import com.github.dnvriend.TestSpec
-import proto.datamodel2.Person
+import com.github.dnvriend.domain.Person.NameChangedEvent
+import com.github.dnvriend.persistence.ProtobufWriter
+import proto.person.command.NameChangedMessage
 
 class PersonSerializerTest extends TestSpec {
   it should "serialize proto.Person to protobuf" in {
-    val javaProtobufPerson = proto.Datamodel2.Person.newBuilder().setId(1).build
+    import com.github.dnvriend.persistence.ProtobufFormats._
+    val nameChangedMessage = implicitly[ProtobufWriter[NameChangedEvent]].write(NameChangedEvent("foo"))
 
-    val person = Person(1)
-    val array = person.toByteArray
-    val personSerializer = serialization.findSerializerFor(person)
-    val javaProtobufPersonSerializer = serialization.findSerializerFor(javaProtobufPerson)
+    val nameChangedScalaPb = NameChangedMessage(Some("foo"))
+    val array = nameChangedScalaPb.toByteArray
+    val personSerializer = serialization.findSerializerFor(nameChangedScalaPb)
+    val javaProtobufPersonSerializer = serialization.findSerializerFor(nameChangedMessage)
     val arraySerializer = serialization.findSerializerFor(array)
     // not akka.remote.serialization.ProtobufSerializer
     personSerializer.getClass.getName shouldBe "akka.serialization.JavaSerializer"

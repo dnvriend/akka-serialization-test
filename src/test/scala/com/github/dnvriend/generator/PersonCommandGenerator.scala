@@ -16,7 +16,7 @@
 
 package com.github.dnvriend.generator
 
-import com.github.dnvriend.domain.Person.{ PersonCommand, ChangeSurname, ChangeName, RegisterName }
+import com.github.dnvriend.domain.Person.{ PersonCommand, ChangeSurnameCommand, ChangeNameCommand, RegisterNameCommand }
 import org.scalacheck.Gen
 
 object PersonCommandGenerator {
@@ -24,19 +24,19 @@ object PersonCommandGenerator {
   val genRegisterName = for {
     name ← Gen.alphaStr
     surname ← Gen.alphaStr
-  } yield RegisterName(name, surname)
+  } yield RegisterNameCommand(name, surname)
 
   val genChangeName = for {
     name ← Gen.alphaStr
-  } yield ChangeName(name)
+  } yield ChangeNameCommand(name)
 
   val genChangeSurname = for {
     surname ← Gen.alphaStr
-  } yield ChangeSurname(surname)
+  } yield ChangeSurnameCommand(surname)
 
   val genCommands: Gen[PersonCommand] = Gen.oneOf(genRegisterName, genChangeName, genChangeSurname)
 
-  def registerNameCommands: List[RegisterName] = Gen.nonEmptyListOf(genRegisterName).sample.get
+  def registerNameCommands: List[RegisterNameCommand] = Gen.nonEmptyListOf(genRegisterName).sample.get
 
   def personCommands: List[PersonCommand] = Gen.nonEmptyListOf(genCommands).sample.get
 }

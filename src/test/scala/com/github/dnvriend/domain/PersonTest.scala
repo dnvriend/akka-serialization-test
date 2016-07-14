@@ -24,7 +24,7 @@ import akka.testkit.TestProbe
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.domain.Person._
 import com.github.dnvriend.persistence.ProtobufReader
-import proto.Datamodel.{ NameChanged, NameRegistered, SurnameChanged }
+import proto.person.Command._
 
 class PersonTest extends TestSpec {
 
@@ -38,46 +38,46 @@ class PersonTest extends TestSpec {
 
   "Person" should "register a name" in {
     withPerson("p1") { ref ⇒ tp ⇒
-      Source(List(RegisterName("dennis", "vriend")))
+      Source(List(RegisterNameCommand("dennis", "vriend")))
         .mapAsync(1)(ref ? _).runWith(Sink.ignore).futureValue
     }
 
     withPerson("p1") { ref ⇒ tp ⇒
-      Source(List(RegisterName("dennis", "vriend")))
+      Source(List(RegisterNameCommand("dennis", "vriend")))
         .mapAsync(1)(ref ? _).runWith(Sink.ignore).futureValue
     }
 
     // note that the persistence-query does not use the deserializer
     // so the protobuf must be deserialized inline
     eventsForPersistenceIdSource("p1").collect {
-      case EventEnvelope(_, _, _, proto: NameRegistered) ⇒
-        implicitly[ProtobufReader[NameRegisteredPersonEvent]].read(proto)
+      case EventEnvelope(_, _, _, proto: NameRegisteredMessage) ⇒
+        implicitly[ProtobufReader[NameRegisteredEvent]].read(proto)
     }.testProbe { tp ⇒
       tp.request(Int.MaxValue)
-      tp.expectNext(NameRegisteredPersonEvent("dennis", "vriend"))
-      tp.expectNext(NameRegisteredPersonEvent("dennis", "vriend"))
+      tp.expectNext(NameRegisteredEvent("dennis", "vriend"))
+      tp.expectNext(NameRegisteredEvent("dennis", "vriend"))
       tp.expectComplete()
     }
   }
 
   it should "update its name and surname" in {
     withPerson("p2") { ref ⇒ tp ⇒
-      Source(List(RegisterName("dennis", "vriend"), ChangeName("jimi"), ChangeSurname("hendrix")))
+      Source(List(RegisterNameCommand("dennis", "vriend"), ChangeNameCommand("jimi"), ChangeSurnameCommand("hendrix")))
         .mapAsync(1)(ref ? _).runWith(Sink.ignore).futureValue
     }
 
     eventsForPersistenceIdSource("p2").collect {
-      case EventEnvelope(_, _, _, proto: NameRegistered) ⇒
-        implicitly[ProtobufReader[NameRegisteredPersonEvent]].read(proto)
-      case EventEnvelope(_, _, _, proto: NameChanged) ⇒
-        implicitly[ProtobufReader[NameChangedPersonEvent]].read(proto)
-      case EventEnvelope(_, _, _, proto: SurnameChanged) ⇒
-        implicitly[ProtobufReader[SurnameChangedPersonEvent]].read(proto)
+      case EventEnvelope(_, _, _, proto: NameRegisteredMessage) ⇒
+        implicitly[ProtobufReader[NameRegisteredEvent]].read(proto)
+      case EventEnvelope(_, _, _, proto: NameChangedMessage) ⇒
+        implicitly[ProtobufReader[NameChangedEvent]].read(proto)
+      case EventEnvelope(_, _, _, proto: SurnameChangedMessage) ⇒
+        implicitly[ProtobufReader[SurnameChangedEvent]].read(proto)
     }.testProbe { tp ⇒
       tp.request(Int.MaxValue)
-      tp.expectNext(NameRegisteredPersonEvent("dennis", "vriend"))
-      tp.expectNext(NameChangedPersonEvent("jimi"))
-      tp.expectNext(SurnameChangedPersonEvent("hendrix"))
+      tp.expectNext(NameRegisteredEvent("dennis", "vriend"))
+      tp.expectNext(NameChangedEvent("jimi"))
+      tp.expectNext(SurnameChangedEvent("hendrix"))
       tp.expectComplete()
     }
   }
