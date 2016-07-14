@@ -1,4 +1,4 @@
-# akka-serialization-test #
+# akka-serialization-test
 
 [![Build Status](https://travis-ci.org/dnvriend/akka-serialization-test.svg?branch=master)](https://travis-ci.org/dnvriend/akka-serialization-test)
 [![Join the chat at https://gitter.im/dnvriend/akka-serialization-test](https://badges.gitter.im/dnvriend/akka-serialization-test.svg)](https://gitter.im/dnvriend/akka-serialization-test?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -6,79 +6,68 @@
 
 Study on [akka-serialization][ser] using [Google Protocol Buffers][pb], [Kryo][kryo] and [Avro][avro]
 
-## TL;DR ##
+## TL;DR
 Define domain command and events messages in the companion object of the `PersistentActor` using DDD concepts.
-Configure the serialization library you wish to use, looking at the examples. Register the serializer to use 
-in `application.conf` in the path `akka.actor.serializers` and register the classes to bind to a certain serializer in the path 
-`akka.actor.serialization-bindings`. When the serializer and bindings have been configured, Akka serialization will transparently 
-serialize/deserialize messages.
+Configure the serialization library you wish to use. Register the serializer to use 
+in `application.conf` in the path `akka.actor.serializers` and register the classes to bind to a certain serializer in the path `akka.actor.serialization-bindings`. When the serializer and bindings have been configured, Akka serialization will transparently serialize/deserialize messages.
 
-## akka-persistence-event-adapters
-![Event Adapters](img/akka-persistence-event-adapters.png)
+## Overview
+[Akka serialization][ser] is a good way for domain messages like commands and events to be serialized to a format of choice. In this example, the domain messages are defined in the companion object of the `Person` which is an `PersistentActor`. The actor handles commands like `RegisterNameCommand`, `ChangeNameCommand` and `ChangeSurnameCommand`, and stores events like `NameRegistedEvent`, `NameChangedEvent` and `SurnameChangedEvent` to persistent storage. The serialization method and the details of the persistent storage is unknown to the `PersistentActor` which is a good thing.
 
-## Overview ##
-[Akka serialization][ser] is a good way for domain messages
-like commands and events to be serialized to a format of choice. In this example, the domain messages are defined
-in the companion object of the `Person` which is an `PersistentActor`. The actor handles commands like `RegisterName`,
-`ChangeName` and `ChangeSurname`, and stores events like `NameRegisted`, `NameChanged` and `SurnameChanged` to 
-persistent storage. The serialization method and the details of the persistent storage is unknown to the `PersistentActor`
-which is a good thing.
-
+In the example below, three serializers are registered, one for Google's Protocol buffers format, which comes out of the box when you add `akka-remote` to your project, one for kryo and a custom Json serializer.
 
 ```
 akka {
     actor {
-        serializers {
-          personCreated = "com.github.dnvriend.serializer.NameRegisteredSerializer"
-          nameChanged = "com.github.dnvriend.serializer.NameChangedSerializer"
-          surnameChanged = "com.github.dnvriend.serializer.SurnameChangedSerializer"
-        }
+            serializers {
+                proto = "akka.remote.serialization.ProtobufSerializer"
+                kryo = "com.twitter.chill.akka.AkkaSerializer"
+                json = "com.github.dnvriend.serializer.json.JsonSerializer"
+            }
     }
 }
 ```
 
-Also, the serialization-binding, which domain class will be handled by which serializer are registered in `application.conf`:
+Also, the serialization-binding, which domain class will be handled by which serializer are registered in `application.conf`. In the example below, all `com.google.protobuf.Message` classes will be handled by the Akka ProtobufSerializer, all `Pet` related messages will be handled by Kryo and all `Order` related messages will be handled by our custom Json serializer. 
 
 ```
 akka {
     actor {
-         serialization-bindings {
-              "com.github.dnvriend.domain.Person$NameRegistered" = personCreated
-              "com.github.dnvriend.domain.Person$NameChanged" = nameChanged
-              "com.github.dnvriend.domain.Person$SurnameChanged" = surnameChanged
-        }
+            serialization-bindings {
+                "com.google.protobuf.Message" = proto
+                "com.github.dnvriend.domain.PetDomain$Pet" = kryo
+                "com.github.dnvriend.domain.OrderDomain$Order" = json
+            }
     }
 }
 ```
 
-Message serialization is now the responsibility of the custom serializer. When no serialization binding can be found 
+Message serialization is the responsibility of akka, how great is that! When no serialization binding can be found 
 to a certain message, the default `akka.serialization.JavaSerializer` will be used, which may or may not be a good thing.
 
-All serializers are responsible for turning an object into an `Array[Byte]` (marshal) and an `Array[Byte]` 
-into an object (unmarshal). Its the responsibility of the serializer to choose an appropriate method for 
+All serializers are responsible for turning an object into an `Array[Byte]` (serializing) and an `Array[Byte]` 
+into an object (deserializing). Its the responsibility of the serializer to choose an appropriate method for 
 serialization. For example, the domain message may be converted to a String representation, eg. CSV, XML or JSON, 
 afterwards the formatted string must be converted to an `Array[Byte]`, because that must be the return type of the 
 serializer when it marshals an object.
 
-The serializer can also be used to convert an `Array[Byte]` into an object (unmarshal). The serializer has all 
+The serializer can also be used to convert an `Array[Byte]` into an object (deserialization). The serializer has all 
 the knowledge to interpret the `Array[Byte]`. When the `Array[Byte]` is actually a CSV, the array must first be 
 converted into a string, then the fields must be parsed, and then an object must be created, because the serializer 
-must return an `AnyRef` type when it unmarshals the `Array[Byte]`.
+must return an `AnyRef` type when it serializes the `Array[Byte]`.
 
-The three custom serializers use [Google Protocol Buffers][pb],
-so the `Array[Byte]` that the persistent storage will store is actually a protobuf object.
+## Event Adapters
+Event adapters are the bridge between the domain model and the data model. When an actor persists messages to the data store, the event adapter is responsible for converting the message from the application model (mostly case classes) and the data model, which could be a Protobuf binding class that has been generated from a `.proto` IDL file for example. These classes all extend the `com.google.protobuf.Message` class, and as such will be serialized using the built-in Akka Protobuf serializer. 
 
-# The example
-The example project shows the following:
+Other strategies are possible as well, just convert the domain class to the format the serializer expects and the serializer will do the rest. 
 
-* How to setup sbt to compile .proto files,
-* How to create custom serializers,
-* How to create a simple Person domain object that handles processes messages and stores state,
-* How to configure akka to use the custom serializers and configure the serialization bindings,
-* How to test the Person domain object
-* How to test the custom serializers.
+One thing to note, and made visual in the image below is that the event adapter is only doing work for the persistent actor. When using the new `akka-persistence-query` api, the event adapters will __not__ be used. Be sure that your application can work with the domain model that has been stored in the journal. For example, when using Protobuf, akka-persistence-query will emit a stream of `EventEnvelope` classes that will contain a `com.google.protobuf.Message` message as the payload; the application should be able to convert this generic protobuf object to a Protobuf binding class that can interpret what the bytes mean. 
 
-## Google Protocol Buffers ##
+When you use other strategies for storing messages in the journal, the bytes could mean JSON, Kryo or whatever data model you use. 
+
+![event adapters](img/akka-persistence-event-adapters.png)
+
+## Google Protocol Buffers
 
 
 ## ScalaPB ##
