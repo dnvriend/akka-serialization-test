@@ -67,6 +67,43 @@ When you use other strategies for storing messages in the journal, the bytes cou
 
 ![event adapters](img/akka-persistence-event-adapters.png)
 
+Event adapters are configured per used akka-persistence journal, for the `akka-persistence-inmemory` plugin, this means that event
+adapters should be configured in the root of `application.conf`:
+
+```
+inmemory-journal {
+  event-adapters {
+    person-write-adapter = "com.github.dnvriend.persistence.PersonWriteEventAdapter"
+    protobuf-read-adapter = "com.github.dnvriend.persistence.ProtobufReadEventAdapter"
+  }
+  event-adapter-bindings {
+    "com.github.dnvriend.domain.Person$PersonEvent" = person-write-adapter
+    "com.google.protobuf.Message" = protobuf-read-adapter
+  }
+}
+```
+
+For the `akka-persistence-jdbc` plugin, this means that event adapters should also be configured in the root of `application.conf`:
+ 
+```
+jdbc-journal {
+  event-adapters {
+    person-write-adapter = "com.github.dnvriend.persistence.PersonWriteEventAdapter"
+    protobuf-read-adapter = "com.github.dnvriend.persistence.ProtobufReadEventAdapter"
+  }
+  event-adapter-bindings {
+    "com.github.dnvriend.domain.Person$PersonEvent" = person-write-adapter
+    "com.google.protobuf.Message" = protobuf-read-adapter
+  }
+}
+```
+
+The configuration above shows that for the inmemory and the JDBC journal event adapters are configured that are
+bound to two classes, one are PersonEvent types and the other is for Protobuf messages. For protobuf the strategy
+`WriteEventAdapter` + `ReadEventAdapter` is used, where _PersonEvent_ types are converted to Protobuf binding classes
+(like all Protobuf binding classes, they extend `com.google.protobuf.Message`), which will be serialized using Akka
+serialization by the persistence-plugin, in our case the inmemory or the JDBC plugin.
+
 ## Google Protocol Buffers
 
 
