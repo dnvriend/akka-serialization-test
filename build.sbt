@@ -73,3 +73,9 @@ PB.javaConversions in PB.protobufConfig := true
 // see: https://github.com/os72/protoc-jar
 PB.runProtoc in PB.protobufConfig := (args =>
   com.github.os72.protocjar.Protoc.runProtoc("-v300" +: args.toArray))
+
+// other options
+//protobuf 2.4.1: -v2.4.1, -v241
+//protobuf 2.5.0: -v2.5.0, -v250
+//protobuf 2.6.1: -v2.6.1, -v261
+//protobuf 3.0.0: -v3.0.0, -v300

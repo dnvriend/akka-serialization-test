@@ -23,12 +23,12 @@ import akka.stream.scaladsl.{ Sink, Source }
 import akka.testkit.TestProbe
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.domain.Person._
-import com.github.dnvriend.persistence.ProtobufDeserializer
+import com.github.dnvriend.persistence.ProtobufReader
 import proto.Datamodel.{ NameChanged, NameRegistered, SurnameChanged }
 
 class PersonTest extends TestSpec {
 
-  import com.github.dnvriend.persistence.PersonEventProtobufEventAdapter._
+  import com.github.dnvriend.persistence.ProtobufFormats._
 
   def withPerson(id: String)(f: ActorRef ⇒ TestProbe ⇒ Unit): Unit = {
     val tp = TestProbe()
@@ -51,7 +51,7 @@ class PersonTest extends TestSpec {
     // so the protobuf must be deserialized inline
     eventsForPersistenceIdSource("p1").collect {
       case EventEnvelope(_, _, _, proto: NameRegistered) ⇒
-        implicitly[ProtobufDeserializer[NameRegisteredPersonEvent]].deserialize(proto)
+        implicitly[ProtobufReader[NameRegisteredPersonEvent]].read(proto)
     }.testProbe { tp ⇒
       tp.request(Int.MaxValue)
       tp.expectNext(NameRegisteredPersonEvent("dennis", "vriend"))
@@ -68,11 +68,11 @@ class PersonTest extends TestSpec {
 
     eventsForPersistenceIdSource("p2").collect {
       case EventEnvelope(_, _, _, proto: NameRegistered) ⇒
-        implicitly[ProtobufDeserializer[NameRegisteredPersonEvent]].deserialize(proto)
+        implicitly[ProtobufReader[NameRegisteredPersonEvent]].read(proto)
       case EventEnvelope(_, _, _, proto: NameChanged) ⇒
-        implicitly[ProtobufDeserializer[NameChangedPersonEvent]].deserialize(proto)
+        implicitly[ProtobufReader[NameChangedPersonEvent]].read(proto)
       case EventEnvelope(_, _, _, proto: SurnameChanged) ⇒
-        implicitly[ProtobufDeserializer[SurnameChangedPersonEvent]].deserialize(proto)
+        implicitly[ProtobufReader[SurnameChangedPersonEvent]].read(proto)
     }.testProbe { tp ⇒
       tp.request(Int.MaxValue)
       tp.expectNext(NameRegisteredPersonEvent("dennis", "vriend"))
