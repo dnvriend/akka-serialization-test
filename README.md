@@ -13,6 +13,9 @@ in `application.conf` in the path `akka.actor.serializers` and register the clas
 `akka.actor.serialization-bindings`. When the serializer and bindings have been configured, Akka serialization will transparently 
 serialize/deserialize messages.
 
+## akka-persistence-event-adapters
+![Event Adapters](img/akka-persistence-event-adapters.png)
+
 ## Overview ##
 [Akka serialization][ser] is a good way for domain messages
 like commands and events to be serialized to a format of choice. In this example, the domain messages are defined
@@ -21,8 +24,6 @@ in the companion object of the `Person` which is an `PersistentActor`. The actor
 persistent storage. The serialization method and the details of the persistent storage is unknown to the `PersistentActor`
 which is a good thing.
 
-Using [Akka serialization][ser], three custom serializers [NameRegisteredSerializer](https://github.com/dnvriend/akka-serialization-test/blob/master/src/main/scala/com/github/dnvriend/serializer/NameRegisteredSerializer.scala),
-[NameChangedSerializer](https://github.com/dnvriend/akka-serialization-test/blob/master/src/main/scala/com/github/dnvriend/serializer/NameChangedSerializer.scala), [SurnameChangedSerializer](https://github.com/dnvriend/akka-serialization-test/blob/master/src/main/scala/com/github/dnvriend/serializer/SurnameChangedSerializer.scala) are registered in `application.conf`: 
 
 ```
 akka {
